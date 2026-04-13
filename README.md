@@ -1,5 +1,7 @@
 # 🚀 Workshop Azure AI Foundry - Iniciação (2 horas)
 
+> **Repositório:** [https://github.com/RenatoSGR/foundry-workshop](https://github.com/RenatoSGR/foundry-workshop)
+
 ## Sobre este Workshop
 
 Workshop prático de introdução ao **Azure AI Foundry** (v2), desenhado para participantes com poucas noções prévias. Em 2 horas, vais explorar modelos de IA, criar agentes inteligentes, configurar RAG com AI Search e muito mais.
