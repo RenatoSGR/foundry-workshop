@@ -142,6 +142,7 @@ def write_env(config: dict, filepath: str = ".env"):
         "",
         "# --- Azure AI Foundry Project ---",
         f"AZURE_AI_FOUNDRY_ENDPOINT={config.get('foundry_endpoint', '')}",
+        f"AZURE_AI_FOUNDRY_PROJECT={config.get('foundry_project', '')}",
         f"AZURE_AI_FOUNDRY_KEY={config.get('foundry_key', '')}",
         "",
         "# --- Model Deployments ---",
@@ -184,53 +185,54 @@ def main():
 
     # 2. Auto-descoberta (se az disponível e autenticado)
     if auto_mode:
-    projects = list_foundry_projects()
+        projects = list_foundry_projects()
 
-    if projects:
-        print(f"\n📋 Projetos encontrados ({len(projects)}):")
-        for i, p in enumerate(projects):
-            print(f"   {i + 1}. {p.get('name', 'N/A')} ({p.get('resourceGroup', 'N/A')})")
+        if projects:
+            print(f"\n📋 Projetos encontrados ({len(projects)}):")
+            for i, p in enumerate(projects):
+                print(f"   {i + 1}. {p.get('name', 'N/A')} ({p.get('resourceGroup', 'N/A')})")
 
-        if len(projects) == 1:
-            chosen = projects[0]
-            print(f"\n→ A usar: {chosen['name']}")
+            if len(projects) == 1:
+                chosen = projects[0]
+                print(f"\n→ A usar: {chosen['name']}")
+            else:
+                idx = int(prompt_user("\nEscolhe o número do projeto", "1")) - 1
+                chosen = projects[idx]
+
+            config["foundry_project"] = chosen.get("name", "")
+            rg = chosen.get("resourceGroup", "")
+
+            # Tentar obter endpoint e key
+            # Para AI Services (Foundry v2), o endpoint é do tipo:
+            # https://<name>.services.ai.azure.com ou https://<name>.cognitiveservices.azure.com
+            ai_services = run_az(
+                f"resource list --resource-group {rg} "
+                f"--resource-type Microsoft.CognitiveServices/accounts"
+            )
+            if ai_services:
+                svc = ai_services[0]
+                svc_name = svc["name"]
+                try:
+                    svc_details = run_az(
+                        f"cognitiveservices account show "
+                        f"--name {svc_name} --resource-group {rg}"
+                    )
+                    config["foundry_endpoint"] = svc_details.get("properties", {}).get(
+                        "endpoint", f"https://{svc_name}.services.ai.azure.com"
+                    )
+                    key = get_ai_services_key(rg, svc_name)
+                    config["foundry_key"] = key
+                except RuntimeError:
+                    config["foundry_endpoint"] = f"https://{svc_name}.services.ai.azure.com"
+
+            # Procurar AI Search
+            search = get_search_details(rg)
+            if search:
+                config["search_endpoint"] = search["endpoint"]
+                config["search_key"] = search["key"]
+                print(f"✅ AI Search encontrado: {search['endpoint']}")
         else:
-            idx = int(prompt_user("\nEscolhe o número do projeto", "1")) - 1
-            chosen = projects[idx]
-
-        rg = chosen.get("resourceGroup", "")
-
-        # Tentar obter endpoint e key
-        # Para AI Services (Foundry v2), o endpoint é do tipo:
-        # https://<name>.services.ai.azure.com ou https://<name>.cognitiveservices.azure.com
-        ai_services = run_az(
-            f"resource list --resource-group {rg} "
-            f"--resource-type Microsoft.CognitiveServices/accounts"
-        )
-        if ai_services:
-            svc = ai_services[0]
-            svc_name = svc["name"]
-            try:
-                svc_details = run_az(
-                    f"cognitiveservices account show "
-                    f"--name {svc_name} --resource-group {rg}"
-                )
-                config["foundry_endpoint"] = svc_details.get("properties", {}).get(
-                    "endpoint", f"https://{svc_name}.services.ai.azure.com"
-                )
-                key = get_ai_services_key(rg, svc_name)
-                config["foundry_key"] = key
-            except RuntimeError:
-                config["foundry_endpoint"] = f"https://{svc_name}.services.ai.azure.com"
-
-        # Procurar AI Search
-        search = get_search_details(rg)
-        if search:
-            config["search_endpoint"] = search["endpoint"]
-            config["search_key"] = search["key"]
-            print(f"✅ AI Search encontrado: {search['endpoint']}")
-    else:
-        print("\n⚠️ Nenhum projeto encontrado automaticamente.")
+            print("\n⚠️ Nenhum projeto encontrado automaticamente.")
 
     # 3. Confirmar/pedir valores manualmente
     if auto_mode:
@@ -242,6 +244,10 @@ def main():
     config["foundry_endpoint"] = prompt_user(
         "  Foundry Endpoint",
         config.get("foundry_endpoint", "https://<nome>.services.ai.azure.com"),
+    )
+    config["foundry_project"] = prompt_user(
+        "  Nome do projeto dentro do Foundry",
+        config.get("foundry_project", ""),
     )
     config["foundry_key"] = prompt_user(
         "  Foundry Key",
@@ -270,6 +276,7 @@ def main():
 
     print("\n📋 Resumo:")
     print(f"   Endpoint: {config['foundry_endpoint']}")
+    print(f"   Projeto:  {config.get('foundry_project', 'N/A')}")
     print(f"   Modelo:   {config['model_deployment']}")
     print(f"   Embeddings: {config['embedding_deployment']}")
     if config.get("search_endpoint"):
