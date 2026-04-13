@@ -2,7 +2,7 @@
 # Instalar com: pip install -r requirements.txt
 
 # Azure AI Foundry SDKs (tudo via Foundry)
-azure-ai-projects>=1.0.0b7
+azure-ai-projects>=2.0.0
 azure-ai-inference>=1.0.0b9
 azure-identity>=1.20.0
 

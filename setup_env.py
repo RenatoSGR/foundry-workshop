@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 🔧 Script de Setup do Workshop Azure AI Foundry
 ================================================
