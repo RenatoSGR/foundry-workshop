@@ -12,17 +12,33 @@ Antes do workshop, certifica-te que tens:
 - [ ] Um **projeto Azure AI Foundry** já criado ([portal](https://ai.azure.com))
 - [ ] Um modelo **GPT-4o** deployado no projeto (deployment name: `gpt-4o`)
 - [ ] Um modelo **text-embedding-ada-002** deployado (deployment name: `text-embedding-ada-002`)
-- [ ] **Python 3.10+** instalado
-- [ ] **Azure CLI** instalado e autenticado (`az login`) — necessário para o script de setup
+- [ ] **Python 3.10+** instalado (já incluído no Codespaces)
+- [ ] **Azure CLI** instalado e autenticado (`az login`) — opcional, permite auto-descoberta
 - [ ] **VS Code** instalado (recomendado) com extensão Jupyter
 - [ ] **Git** instalado
 
 ## ⚡ Setup Rápido (5 minutos)
 
+### Opção A: GitHub Codespaces (mais rápido) ☁️
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/RenatoSGR/foundry-workshop/codespaces/new)
+
+1. Clica no botão acima (ou vai a **Code → Codespaces → New codespace**)
+2. Espera que o ambiente carregue (as dependências instalam-se automaticamente)
+3. No terminal, executa:
+   ```bash
+   python setup_env.py
+   ```
+4. O script pede-te os valores do portal ([ai.azure.com](https://ai.azure.com) → teu projeto → Overview)
+
+> No Codespaces a Azure CLI já vem instalada. Se fizeres `az login`, o script descobre tudo automaticamente.
+
+### Opção B: Local
+
 ```bash
 # 1. Clona o repositório
-git clone <URL_DO_REPO>
-cd workshop
+git clone https://github.com/RenatoSGR/foundry-workshop.git
+cd foundry-workshop
 
 # 2. Cria ambiente virtual
 python -m venv .venv
@@ -36,13 +52,15 @@ source .venv/bin/activate
 # 3. Instala dependências
 pip install -r requirements.txt
 
-# 4. Configura automaticamente o .env (recomendado)
+# 4. Configura o .env
 python setup_env.py
 ```
 
-O script `setup_env.py` usa a Azure CLI para **descobrir automaticamente** o teu projeto Foundry, extrair endpoints, keys e popular o `.env` sem teres de copiar nada manualmente.
+O script `setup_env.py` funciona em **dois modos**:
+- **Com Azure CLI** (`az login`): descobre automaticamente o teu projeto, extrai endpoints e keys
+- **Sem Azure CLI** (Codespaces, etc.): pede os valores manualmente — copia do portal [ai.azure.com](https://ai.azure.com)
 
-> **Alternativa manual:** Se preferires, copia `.env.template` para `.env` e preenche os valores à mão.
+> **Alternativa manual:** Copia `.env.template` para `.env` e preenche os valores à mão.
 
 ## 📁 Estrutura do Repositório
 

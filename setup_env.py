@@ -34,6 +34,18 @@ def run_az(cmd: str) -> dict | list | str:
         return result.stdout.strip()
 
 
+def is_az_available() -> bool:
+    """Verifica se a Azure CLI está instalada."""
+    try:
+        subprocess.run(
+            "az version --output json",
+            shell=True, capture_output=True, text=True, timeout=10,
+        )
+        return True
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+
 def check_az_login():
     """Verifica se o utilizador está autenticado no Azure CLI."""
     try:
@@ -44,7 +56,7 @@ def check_az_login():
     except RuntimeError:
         print("❌ Não estás autenticado no Azure CLI.")
         print("   Executa: az login")
-        sys.exit(1)
+        return None
 
 
 def list_foundry_projects():
@@ -157,12 +169,21 @@ def main():
     print("  🚀 Setup do Workshop Azure AI Foundry")
     print("=" * 55)
 
-    # 1. Verificar login
-    account = check_az_login()
-
     config = {}
+    auto_mode = False
 
-    # 2. Tentar auto-descoberta
+    # 1. Verificar se az CLI está disponível
+    if is_az_available():
+        account = check_az_login()
+        if account:
+            auto_mode = True
+    else:
+        print("\n⚠️  Azure CLI não encontrada.")
+        print("   A funcionar em modo manual (Codespaces / ambiente sem az CLI).")
+        print("   Vai precisar de copiar os valores do portal: https://ai.azure.com")
+
+    # 2. Auto-descoberta (se az disponível e autenticado)
+    if auto_mode:
     projects = list_foundry_projects()
 
     if projects:
@@ -212,7 +233,11 @@ def main():
         print("\n⚠️ Nenhum projeto encontrado automaticamente.")
 
     # 3. Confirmar/pedir valores manualmente
-    print("\n📝 Confirma os valores (Enter para manter o valor auto-detectado):\n")
+    if auto_mode:
+        print("\n📝 Confirma os valores (Enter para manter o valor auto-detectado):\n")
+    else:
+        print("\n📝 Introduz os valores do teu projeto Azure AI Foundry:")
+        print("   (encontras tudo em https://ai.azure.com → teu projeto → Overview)\n")
 
     config["foundry_endpoint"] = prompt_user(
         "  Foundry Endpoint",
