@@ -1,0 +1,22 @@
+# Azure AI Foundry Workshop - Dependências
+# Instalar com: pip install -r requirements.txt
+
+# Azure AI SDKs
+azure-ai-projects>=1.0.0b7
+azure-ai-inference>=1.0.0b9
+azure-identity>=1.20.0
+
+# Azure OpenAI
+openai>=1.60.0
+
+# Azure AI Search
+azure-search-documents>=11.6.0b8
+
+# Azure AI Evaluation
+azure-ai-evaluation>=1.5.0
+
+# Utilities
+python-dotenv>=1.0.1
+requests>=2.32.0
+pandas>=2.2.0
+ipykernel>=6.29.0
