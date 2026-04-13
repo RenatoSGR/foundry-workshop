@@ -146,6 +146,9 @@ def write_env(config: dict, filepath: str = ".env"):
         f"AZURE_AI_FOUNDRY_PROJECT={config.get('foundry_project', '')}",
         f"AZURE_AI_FOUNDRY_KEY={config.get('foundry_key', '')}",
         "",
+        "# --- Azure AI Agent Service (Lab 3.1) ---",
+        f"AZURE_AI_AGENT_ENDPOINT={config.get('agent_endpoint', '')}",
+        "",
         "# --- Model Deployments ---",
         f"MODEL_DEPLOYMENT={config.get('model_deployment', 'gpt-4o')}",
         f"EMBEDDING_DEPLOYMENT={config.get('embedding_deployment', 'text-embedding-ada-002')}",
@@ -226,6 +229,13 @@ def main():
                 except RuntimeError:
                     config["foundry_endpoint"] = f"https://{svc_name}.services.ai.azure.com"
 
+            # Derivar Agent Service endpoint
+            if config.get("foundry_endpoint") and config.get("foundry_project"):
+                base = config["foundry_endpoint"].rstrip("/")
+                # Agent endpoint needs services.ai.azure.com (not cognitiveservices)
+                base = base.replace(".cognitiveservices.azure.com", ".services.ai.azure.com")
+                config["agent_endpoint"] = f"{base}/api/projects/{config['foundry_project']}"
+
             # Procurar AI Search
             search = get_search_details(rg)
             if search:
@@ -272,11 +282,23 @@ def main():
     )
     config["search_index"] = "workshop-index"
 
+    # Derivar agent endpoint se ainda não definido
+    if not config.get("agent_endpoint") and config.get("foundry_endpoint") and config.get("foundry_project"):
+        base = config["foundry_endpoint"].rstrip("/")
+        base = base.replace(".cognitiveservices.azure.com", ".services.ai.azure.com")
+        config["agent_endpoint"] = f"{base}/api/projects/{config['foundry_project']}"
+
+    config["agent_endpoint"] = prompt_user(
+        "  Agent Service Endpoint (Lab 3.1)",
+        config.get("agent_endpoint", ""),
+    )
+
     # 4. Escrever .env
     write_env(config)
 
     print("\n📋 Resumo:")
     print(f"   Endpoint: {config['foundry_endpoint']}")
+    print(f"   Agent EP: {config.get('agent_endpoint', 'N/A')}")
     print(f"   Projeto:  {config.get('foundry_project', 'N/A')}")
     print(f"   Modelo:   {config['model_deployment']}")
     print(f"   Embeddings: {config['embedding_deployment']}")
