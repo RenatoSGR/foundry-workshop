@@ -1,17 +1,17 @@
-# 🚀 Workshop Azure AI Foundry - Iniciação (2 horas)
+# 🚀 Workshop Microsoft Foundry - Iniciação (2 horas)
 
 > **Repositório:** [https://github.com/RenatoSGR/foundry-workshop](https://github.com/RenatoSGR/foundry-workshop)
 
 ## Sobre este Workshop
 
-Workshop prático de introdução ao **Azure AI Foundry** (v2), desenhado para participantes com poucas noções prévias. Em 2 horas, vais explorar modelos de IA, criar agentes inteligentes, configurar RAG com AI Search e muito mais.
+Workshop prático de introdução ao **Microsoft Foundry** (v2), desenhado para participantes com poucas noções prévias. Em 2 horas, vais explorar modelos de IA, criar agentes inteligentes, configurar RAG com AI Search e muito mais.
 
 ## 📋 Pré-requisitos
 
 Antes do workshop, certifica-te que tens:
 
 - [ ] Uma conta Azure com uma **subscrição ativa** ([criar conta gratuita](https://azure.microsoft.com/free/))
-- [ ] Um **projeto Azure AI Foundry** já criado ([portal](https://ai.azure.com))
+- [ ] Um **projeto Microsoft Foundry** já criado ([portal](https://ai.azure.com))
 - [ ] Um modelo **GPT-4o** deployado no projeto (deployment name: `gpt-4o`)
 - [ ] Um modelo **text-embedding-ada-002** deployado (deployment name: `text-embedding-ada-002`)
 - [ ] **Python 3.10+** instalado (já incluído no Codespaces)
@@ -73,12 +73,21 @@ foundry-workshop/
 ├── setup_env.py                       # Script automático de configuração
 ├── .env.template                      # Template de configuração (manual)
 ├── labs/
-│   ├── lab02-modelos.ipynb            # Lab 2: Modelos e Deployments (15 min)
-│   ├── lab03-agentes.ipynb            # Lab 3: Agentes com Tools (15 min)
-│   ├── lab03.1-agentes.ipynb          # Lab 3.1: Agentes com Foundry v2 SDK (15 min)
-│   ├── lab04-model-workflows.ipynb    # Lab 4: Workflows com LLM (15 min)
-│   ├── lab05b-agent-workflows.ipynb   # Lab 5b: Multi-Agent Workflows (15 min)
-│   └── README-lab06-knowledge.md      # Lab 6: Knowledge & RAG (guia)
+│   ├── lab02/
+│   │   ├── README.md                  # Guia passo a passo
+│   │   └── lab02-modelos.ipynb        # Lab 2: Modelos e Deployments (15 min)
+│   ├── lab03/
+│   │   ├── README.md                  # Guia passo a passo
+│   │   ├── lab03-agentes.ipynb        # Lab 3: Agentes com Tools (15 min)
+│   │   └── lab03.1-agentes.ipynb      # Lab 3.1: Agentes com Foundry v2 SDK (15 min)
+│   ├── lab04/
+│   │   ├── README.md                  # Guia passo a passo
+│   │   └── lab04-model-workflows.ipynb # Lab 4: Workflows com LLM (15 min)
+│   ├── lab05/
+│   │   ├── README.md                  # Guia passo a passo
+│   │   └── lab05b-agent-workflows.ipynb # Lab 5: Multi-Agent Workflows (15 min)
+│   └── lab06/
+│       └── README.md                  # Lab 6: Knowledge & RAG (guia)
 └── data/
     └── documentos/
         └── exemplo.md                 # Documento exemplo para RAG
@@ -135,8 +144,8 @@ Copia `.env.template` para `.env` e preenche:
 
 ## 📚 Recursos Adicionais
 
-- [Documentação Azure AI Foundry](https://learn.microsoft.com/azure/ai-studio/)
-- [Azure AI Foundry Portal](https://ai.azure.com)
+- [Documentação Microsoft Foundry](https://learn.microsoft.com/azure/ai-studio/)
+- [Microsoft Foundry Portal](https://ai.azure.com)
 - [SDK azure-ai-projects](https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme)
 - [SDK azure-ai-inference](https://learn.microsoft.com/python/api/overview/azure/ai-inference-readme)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/)
