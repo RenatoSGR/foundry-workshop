@@ -67,21 +67,18 @@ O script `setup_env.py` funciona em **dois modos**:
 ## 📁 Estrutura do Repositório
 
 ```
-workshop/
+foundry-workshop/
 ├── README.md                          # Este ficheiro
 ├── requirements.txt                   # Dependências Python
 ├── setup_env.py                       # Script automático de configuração
 ├── .env.template                      # Template de configuração (manual)
 ├── labs/
-│   ├── lab01-intro-foundry.ipynb      # Lab 1: Intro e Componentes (10 min)
 │   ├── lab02-modelos.ipynb            # Lab 2: Modelos e Deployments (15 min)
 │   ├── lab03-agentes.ipynb            # Lab 3: Agentes com Tools (15 min)
-│   ├── lab04-knowledge-rag.ipynb      # Lab 4: Knowledge, RAG & AI Search (15 min)
-│   ├── lab05-workflows.ipynb          # Lab 5: Workflows com LLM (10 min)
-│   ├── lab05b-agent-workflows.ipynb   # Lab 5b: Workflow de Agentes Sequencial (15 min)
-│   ├── lab06-apim.ipynb               # Lab 6: API Management para IA (10 min)
-│   ├── lab07-observabilidade.ipynb    # Lab 7: Observabilidade e Governance (10 min)
-│   └── lab08-red-teaming.ipynb        # Lab 8: Red Teaming (10 min)
+│   ├── lab03.1-agentes.ipynb          # Lab 3.1: Agentes com Foundry v2 SDK (15 min)
+│   ├── lab04-model-workflows.ipynb    # Lab 4: Workflows com LLM (15 min)
+│   ├── lab05b-agent-workflows.ipynb   # Lab 5b: Multi-Agent Workflows (15 min)
+│   └── README-lab06-knowledge.md      # Lab 6: Knowledge & RAG (guia)
 └── data/
     └── documentos/
         └── exemplo.md                 # Documento exemplo para RAG
@@ -91,15 +88,12 @@ workshop/
 
 | # | Lab | Duração | Tópicos |
 |---|-----|---------|---------|
-| 1 | Intro e Componentes Foundry | 10 min | O que é o Foundry, portal, componentes principais |
-| 2 | Modelos e Deployment | 20 min | Deploy de modelos, playground, métricas, consumir via código |
-| 3 | Agentes | 30 min | O que são agentes, criar agentes, tools, publicar no M365 |
-| 4 | Knowledge & RAG | 15 min | RAG, indexação, AI Search, grounding |
-| 5 | Workflows com LLM | 10 min | Pipelines de chamadas encadeadas ao modelo |
-| 5b | Workflow de Agentes | 15 min | Pipeline sequencial de agentes Foundry |
-| 6 | API Management | 10 min | APIM como gateway para modelos de IA |
-| 7 | Observabilidade & Governance | 10 min | Monitoring, tracing, governance |
-| 8 | Red Teaming | 10 min | Testes de segurança de modelos |
+| 2 | Modelos e Deployment | 15 min | Deploy de modelos, consumir via código, chat completions |
+| 3 | Agentes | 15 min | Criar agentes, tools, agent framework |
+| 3.1 | Agentes Foundry v2 | 15 min | Agentes server-side com `AIProjectClient`, Responses API |
+| 4 | Workflows com LLM | 15 min | Pipelines de chamadas encadeadas ao modelo (prompt chaining) |
+| 5b | Multi-Agent Workflows | 15 min | ConnectedAgentTool, orquestrador, Workflow Agent (preview) |
+| 6 | Knowledge & RAG | 15 min | RAG, AI Search, grounding (guia) |
 | - | Conclusões | 5 min | Recap e próximos passos |
 
 ## 🔧 Configuração do .env
