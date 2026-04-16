@@ -101,13 +101,13 @@ foundry-workshop/
 
 | # | Lab | Duration | Topics |
 |---|-----|----------|--------|
-| 1 | [Models and Deployment](labs/lab01/) | 15 min | Model deployment, consuming via code, chat completions |
-| 2 | [Agents](labs/lab02/) | 15 min | Creating agents, tools, function calling |
-| 2.1 | [Agents with Agent Service](labs/lab02/) | 15 min | Prompt agents, `AIProjectClient`, Agents Playground |
-| 3 | [Workflows with LLM](labs/lab03/) | 15 min | Prompt chaining, chained pipelines, Workflow Agents |
-| 4 | [Multi-Agent Workflows](labs/lab04/) | 15 min | ConnectedAgentTool, visual workflows, orchestration |
-| 5 | [Knowledge & RAG](labs/lab05/) | 15 min | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
-| - | Wrap-up | 5 min | Recap and next steps |
+| 1 | [Models and Deployment](labs/lab01/) | 1 hour | Model deployment, consuming via code, chat completions |
+| 2 | [Agents](labs/lab02/) | 1 hour | Creating agents, tools, function calling |
+| 2.1 | [Agents with Agent Service](labs/lab02/) | 1 hour | Prompt agents, `AIProjectClient`, Agents Playground |
+| 3 | [Workflows with LLM](labs/lab03/) | 1 hour | Prompt chaining, chained pipelines, Workflow Agents |
+| 4 | [Multi-Agent Workflows](labs/lab04/) | 1 hour | ConnectedAgentTool, visual workflows, orchestration |
+| 5 | [Knowledge & RAG](labs/lab05/) | 1 hour | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
+
 
 ## 🔧 .env Configuration
 
