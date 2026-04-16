@@ -80,21 +80,21 @@ foundry-workshop/
 ├── labs/
 │   ├── lab01/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   └── lab01-modelos.ipynb        # Lab 1: Models and Deployments (15 min)
+│   │   └── lab01-modelos.ipynb        # Lab 1: Models and Deployments (1 hour)
 │   ├── lab02/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   ├── lab02-agentes.ipynb        # Lab 2: Agents with Tools (15 min)
-│   │   └── lab02.1-agentes.ipynb      # Lab 2.1: Agents with Agent Service (15 min)
+│   │   ├── lab02-agentes.ipynb        # Lab 2: Agents with Tools (1 hour)
+│   │   └── lab02.1-agentes.ipynb      # Lab 2.1: Agents with Agent Service (1 hour)
 │   ├── lab03/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   └── lab03-model-workflows.ipynb # Lab 3: Workflows with LLM (15 min)
+│   │   └── lab03-model-workflows.ipynb # Lab 3: Workflows with LLM (1 hour)
 │   ├── lab04/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   └── lab04b-agent-workflows.ipynb # Lab 4: Multi-Agent Workflows (15 min)
+│   │   └── lab04b-agent-workflows.ipynb # Lab 4: Multi-Agent Workflows (1 hour)
 │   └── lab05/
-│       └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (guide)
+│       └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (1 hour)
 └── data/
-    └── documentos/                    # Sample documents for RAG
+    └── documents/                    # Sample documents for RAG
 ```
 
 ## 🗺️ Agenda
