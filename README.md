@@ -168,7 +168,7 @@ The new Foundry portal has its main navigation in the **top menu**:
 - **Follow the steps in order** — each lab builds on the previous one
 - **If you get an error** — check that `.env` is correct and the models are deployed
 - **New Foundry toggle** — make sure it's active in the portal's top banner
-- **Ask for help** — the instructor is here for that!
+- **Ask for help** — contact microsoft or raise an issue in the repository if you get stuck
 
 ## 📚 Additional Resources
 
