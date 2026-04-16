@@ -7,7 +7,7 @@
 
 ## About this Workshop
 
-A hands-on introductory workshop on **Microsoft Foundry**, designed for participants with little prior experience. You'll explore AI models, create intelligent agents, configure RAG with Foundry IQ, and much more.
+A hands-on introductory workshop on **Microsoft Foundry**, designed for participants with little prior experience. You'll explore AI models, create intelligent agents, build multi-agent workflows, and configure governance with AI Gateway.
 
 > **Note:** This workshop uses the **new Foundry portal** (toggle "New Foundry" enabled at [ai.azure.com](https://ai.azure.com)). Make sure the toggle is active before you begin.
 
@@ -18,7 +18,7 @@ Before the workshop, make sure you have:
 - [ ] An Azure account with an **active subscription** ([create a free account](https://azure.microsoft.com/free/))
 - [ ] A **Microsoft Foundry project** already created ([portal](https://ai.azure.com))
 - [ ] A **GPT-4o** model deployed in the project (deployment name: `gpt-4o`)
-- [ ] A **text-embedding-ada-002** model deployed (deployment name: `text-embedding-ada-002`)
+- [ ] A **text-embedding-ada-002** model deployed (deployment name: `text-embedding-ada-002`) — optional, for embeddings
 - [ ] **Python 3.10+** installed (already included in Codespaces)
 - [ ] **Azure CLI** installed and authenticated (`az login`) — optional, enables auto-discovery
 - [ ] **VS Code** installed (recommended) with Jupyter extension
@@ -91,10 +91,12 @@ foundry-workshop/
 │   ├── lab04/
 │   │   ├── README.md                  # Step-by-step guide
 │   │   └── lab04b-agent-workflows.ipynb # Lab 4: Multi-Agent Workflows (1 hour)
-│   └── lab05/
-│       └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (1 hour)
+│   ├── lab05/
+│   │   └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (guide)
+│   └── lab06/
+│       └── README.md                  # Lab 6: Governance with AI Gateway (guide)
 └── data/
-    └── documents/                    # Sample documents for RAG
+    └── documents/                    # Sample documents
 ```
 
 ## 🗺️ Agenda
@@ -107,6 +109,7 @@ foundry-workshop/
 | 3 | [Workflows with LLM](labs/lab03/) | 1 hour | Prompt chaining, chained pipelines, Workflow Agents |
 | 4 | [Multi-Agent Workflows](labs/lab04/) | 1 hour | ConnectedAgentTool, visual workflows, orchestration |
 | 5 | [Knowledge & RAG](labs/lab05/) | 1 hour | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
+| 6 | [Governance with AI Gateway](labs/lab06/) | 1 hour | AI Gateway, APIM, token limits, quotas, governance |
 
 
 ## 🔧 .env Configuration
@@ -171,6 +174,7 @@ The new Foundry portal has its main navigation in the **top menu**:
 - [Microsoft Foundry Portal](https://ai.azure.com)
 - [Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/overview)
 - [Foundry IQ (Knowledge)](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
+- [AI Gateway in Foundry](https://learn.microsoft.com/azure/foundry/configuration/enable-ai-api-management-gateway-portal)
 - [SDK azure-ai-projects](https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/)
 - [Foundry Playgrounds](https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds)

@@ -26,7 +26,7 @@ Documents (PDF, MD, Word, etc.)
            ▼
 ┌──────────────────────────┐
 │  Azure AI Search          │  Indexing + vector search
-│  (managed infrastructure) │
+│  (managed infrastructure) │  (created/connected via Foundry IQ)
 └──────────┬───────────────┘
            │
            ▼
@@ -49,7 +49,7 @@ Documents (PDF, MD, Word, etc.)
 | **Knowledge Base** | Top-level resource that orchestrates agentic retrieval. Defines which knowledge sources to query and behavior parameters (retrieval reasoning effort: minimal, low, medium). |
 | **Knowledge Source** | Connection to indexed or remote content (Azure Blob Storage, SharePoint, OneLake, web). A knowledge base can have multiple knowledge sources. |
 | **Agentic Retrieval** | Multi-query pipeline that breaks down complex questions into sub-queries, executes them in parallel, performs semantic reranking, and returns unified answers with citations. |
-| **Azure AI Search** | Provides the underlying indexing and search infrastructure. It is **required** for Foundry IQ. |
+| **Azure AI Search** | Provides the underlying indexing and search infrastructure. |
 
 ---
 
@@ -81,8 +81,10 @@ The Storage Account serves as the central repository for the documents that will
 
 1. Open the `documentos` container
 2. Click **Upload**
-3. Select the files from the `data/documentos/` folder in this repository
+3. Select the files you want to index (PDF, Markdown, TXT, Word, etc.)
 4. Click **Upload**
+
+> 💡 **Tip:** Organize documents into folders within the container for easier management. AI Search can navigate the folder structure automatically.
 
 ---
 
@@ -97,50 +99,153 @@ AI Search provides the indexing and search infrastructure used by Foundry IQ.
    - **Resource group:** the same as the Foundry project
    - **Service name:** a unique name (e.g., `search-workshop-knowledge`)
    - **Region:** the same region as the Foundry project
-   - **Pricing tier:** **Basic** (sufficient for the workshop)
+   - **Pricing tier:** **Basic** (sufficient for the workshop; the Free tier does not support agentic retrieval)
 3. Click **Review + Create** → **Create**
-4. Wait for the deployment to complete
+
+> ⚠️ **Important:** AI Search and the Storage Account should be in the **same region** for best performance. For proof-of-concept, you can use the **free tier** of AI Search with a free token allocation for agentic retrieval.
+
+> 💡 **Note:** In the new Foundry, you can create or connect the AI Search service directly from the Foundry portal (Step 4), without needing to create it manually first. The manual step is useful if you want more control over the configuration.
 
 ---
 
-## Step 3 — Configure the Knowledge Base via Foundry IQ
+## Step 3 — Deploy an Embedding Model in Foundry
 
-### In the Microsoft Foundry portal ([ai.azure.com](https://ai.azure.com)):
+The embedding model is required to convert text into numerical vectors, enabling semantic search. Foundry IQ automates embedding generation during indexing, but it needs a deployed model.
 
-1. Make sure the **New Foundry** toggle is active in the top banner
-2. Select your **project**
+### Why an embedding model?
+
+- Converts text into high-dimensional vectors that capture **semantic meaning**
+- Allows finding relevant documents even if they don't contain the exact words from the query
+- Foundry IQ uses it automatically for chunking and vector embedding generation
+
+### In the Microsoft Foundry Portal ([ai.azure.com](https://ai.azure.com)):
+
+1. Open your **project**
+2. Go to **Models + endpoints** (side menu)
+3. Click **+ Deploy model** → **Deploy base model**
+4. Search for and select **text-embedding-ada-002** (or **text-embedding-3-small** for better performance)
+5. Set the **deployment name** (e.g., `text-embedding-ada-002`)
+6. Select the capacity (tokens per minute) — the minimum is sufficient for the workshop
+7. Click **Deploy**
+
+> 💡 **Note:** `text-embedding-3-small` is newer and more efficient. Both work. Foundry IQ needs an Azure OpenAI embedding model for agentic retrieval.
+
+---
+
+## Step 4 — Create Knowledge Base and Knowledge Sources in Foundry IQ
+
+In the new Foundry, knowledge base creation uses **Foundry IQ**, which automates chunking, embedding, and indexing — and supports **agentic retrieval** (query decomposition, parallel search, reranking, and citations).
+
+### In the Microsoft Foundry Portal ([ai.azure.com](https://ai.azure.com)):
+
+1. Make sure the **New Foundry** toggle is **ON** (top corner)
+2. Open your **project**
 3. In the top menu, click **Build**
-4. In the left panel, select the **Knowledge** tab
-5. Create or connect to your Azure AI Search (created in Step 2)
-6. Click **+ Add knowledge source**:
-   - Select **Azure Blob Storage** as the source type
-   - Connect to the Storage Account and `documentos` container created in Step 1
-   - Foundry IQ automatically handles: chunking, embedding generation, and indexing
-7. Configure the **Retrieval reasoning effort** (e.g., `medium` for better quality)
-8. Wait for indexing to complete
+
+### Create/connect the AI Search service:
+
+4. In the **Knowledge** tab:
+   - Click to **create or connect** to an existing AI Search service (from Step 2)
+   - If you haven't created one yet, Foundry can create one for you
+
+### Create a Knowledge Source:
+
+5. Click **Add knowledge source**
+6. Select **Azure Blob Storage** as the source type
+7. Configure the connection:
+   - Select the **Storage Account** from Step 1
+   - Select the `documentos` container
+8. Foundry IQ automatically:
+   - Reads the documents from Storage
+   - Splits them into chunks (automatic document chunking)
+   - Generates vector embeddings using the model from Step 3
+   - Extracts metadata
+   - Indexes everything in AI Search
+
+### Create the Knowledge Base:
+
+9. Still in the **Knowledge** tab, click **Create knowledge base**
+10. Add the knowledge source(s) created above
+11. Configure the retrieval parameters:
+    - **Retrieval reasoning effort:** `low` for the workshop (options: minimal, low, medium)
+    - This controls the level of LLM processing for query planning
+12. Click **Create**
+
+### Wait for indexing:
+
+- Progress is visible on the Knowledge Base page
+- When the status changes to **Ready**, it's ready to use
+- You can configure **recurring indexer runs** for incremental data refresh
+
+> 💡 **Note:** A knowledge base can contain **multiple knowledge sources** (e.g., Blob Storage + SharePoint + web). Multiple agents can **share the same knowledge base**.
 
 ---
 
-## Step 4 — Connect the Knowledge Base to an Agent
+## Step 5 — Connect the Knowledge Base to an Agent
 
-1. In the Foundry portal → **Build** → **Agents**
-2. Select an existing agent or create a new one
-3. In the agent configuration, add the **Knowledge Base** as a knowledge source
-4. Save the changes
+### In the Foundry Portal (Agents tab):
+
+1. In the **Build** menu, go to the **Agents** tab
+2. Create a new agent or select an existing one
+3. In **Knowledge**, connect the knowledge base created in Step 4
+4. Use the **Playground** to send messages and test the agent
+
+The agent now uses **agentic retrieval** from Foundry IQ:
+- Breaks down complex questions into sub-queries
+- Executes searches in parallel across knowledge sources
+- Performs semantic reranking of results
+- Returns answers with **citations** to source documents
+- Respects **permissions** (ACLs) and Microsoft Purview sensitivity labels
+
+### In the Foundry Playground:
+
+1. Ask questions about the content of your documents
+2. Verify that responses include **citations** with links to the original documents
+3. Test with complex questions that require cross-referencing information from multiple documents
+
+> 📖 For code integration, see: [Connect Foundry IQ to Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/how-to/foundry-iq/)
 
 ---
 
-## Step 5 — Test in the Agents Playground
+## Summary of Created Resources
 
-1. In the Agents Playground of the configured agent
-2. Ask questions about the content of the uploaded documents
-3. Verify that responses include **citations** from the original documents
-4. Test with complex questions to observe **agentic retrieval** in action
+| Resource | Purpose |
+|----------|---------|
+| **Storage Account** + Container | Store original documents |
+| **Azure AI Search** | Indexing and search infrastructure (managed by Foundry IQ) |
+| **Embedding Model** (deployment) | Convert text into semantic vectors (used automatically by Foundry IQ) |
+| **Knowledge Source** (Foundry IQ) | Connection to data store with automatic chunking and embeddings |
+| **Knowledge Base** (Foundry IQ) | Orchestrate agentic retrieval with citations and permissions |
 
 ---
 
-## Expected Result
+## Required Environment Variables
 
-- Knowledge Base configured and functional with Foundry IQ
-- Agent with access to documents via agentic retrieval
-- Responses with citations from the uploaded documents
+If you want to use the Knowledge Base via code, add to your `.env` file:
+
+```env
+AZURE_SEARCH_ENDPOINT=https://<search-name>.search.windows.net
+AZURE_SEARCH_KEY=<search-admin-key>
+EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+```
+
+---
+
+## Troubleshooting
+
+| Issue | Resolution |
+|-------|------------|
+| Indexing fails | Check that AI Search has permissions to access Storage (same region, or configure managed identity) |
+| Poor search results | Increase the **retrieval reasoning effort** (from minimal to medium) in the knowledge base |
+| Knowledge Source not indexing | Verify the embedding model is deployed and accessible in the project |
+| Agent doesn't find documents | Confirm the knowledge base is **Ready** and connected to the agent |
+| "New Foundry" toggle not visible | Make sure you're at [ai.azure.com](https://ai.azure.com) with the new portal enabled |
+| Permission errors | Configure managed identities instead of keys for production environments |
+
+---
+
+## References
+
+- [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
+- [Tutorial: Build an end-to-end agentic retrieval solution](https://learn.microsoft.com/azure/search/search-how-to-agentic-retrieval-solution)
+- [Microsoft Foundry Portal](https://ai.azure.com)
