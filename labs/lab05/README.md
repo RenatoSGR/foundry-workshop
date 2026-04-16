@@ -1,233 +1,112 @@
-# Lab 05 — Knowledge Base with Foundry IQ
+# Lab 05 — Governance with AI Gateway
 
-Step-by-step guide to creating a **Knowledge Base** using **Foundry IQ** in Microsoft Foundry. Foundry IQ is the managed knowledge layer that connects structured and unstructured data (Azure Storage, SharePoint, OneLake, web) so that agents can access answers with permissions and citations.
+![AI Gateway in Foundry](../../images/ai-gateway-architecture.png)
 
-> 📖 **Official reference:** [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
+Step-by-step guide to enabling **AI Gateway** in Microsoft Foundry for governance, token limits, and quota management of your AI models, tools, and agents.
 
----
-
-## Architecture (Foundry IQ)
-
-```
-Documents (PDF, MD, Word, etc.)
-        │
-        ▼
-┌──────────────────────────┐
-│  Azure Storage            │  Document storage
-│  (Blob Container)         │
-└──────────┬───────────────┘
-           │
-           ▼
-┌──────────────────────────┐
-│  Knowledge Source          │  Connection to data store
-│  (Foundry IQ)             │  (automatic chunking + embeddings)
-└──────────┬───────────────┘
-           │
-           ▼
-┌──────────────────────────┐
-│  Azure AI Search          │  Indexing + vector search
-│  (managed infrastructure) │  (created/connected via Foundry IQ)
-└──────────┬───────────────┘
-           │
-           ▼
-┌──────────────────────────┐
-│  Knowledge Base           │  Agentic Retrieval
-│  (Foundry IQ)             │  (multi-query, reranking, citations)
-└──────────┬───────────────┘
-           │
-           ▼
-┌──────────────────────────┐
-│  Agent                    │  Uses Knowledge Base for RAG
-│  (Foundry Agent Service)  │
-└──────────────────────────┘
-```
-
-### Key Foundry IQ Concepts
-
-| Component | Description |
-|-----------|-------------|
-| **Knowledge Base** | Top-level resource that orchestrates agentic retrieval. Defines which knowledge sources to query and behavior parameters (retrieval reasoning effort: minimal, low, medium). |
-| **Knowledge Source** | Connection to indexed or remote content (Azure Blob Storage, SharePoint, OneLake, web). A knowledge base can have multiple knowledge sources. |
-| **Agentic Retrieval** | Multi-query pipeline that breaks down complex questions into sub-queries, executes them in parallel, performs semantic reranking, and returns unified answers with citations. |
-| **Azure AI Search** | Provides the underlying indexing and search infrastructure. |
+> 📖 **Official reference:** [Configure AI Gateway in your Foundry resources](https://learn.microsoft.com/azure/foundry/configuration/enable-ai-api-management-gateway-portal)
 
 ---
 
-## Step 1 — Create a Storage Account and Container
+## What is AI Gateway?
 
-The Storage Account serves as the central repository for the documents that will feed the Knowledge Base.
+AI Gateway uses **Azure API Management (APIM)** behind the scenes to provide:
 
-### In the Azure Portal ([portal.azure.com](https://portal.azure.com)):
+- **Token limits and quotas** per project or per agent
+- **Cost control** by capping aggregate usage
+- **Multi-team containment** — prevent one project from monopolizing capacity
+- **Compliance boundaries** for regulated workloads
+- **Governance** of custom agents, MCP tools, and A2A agent tools
 
-1. Search for **Storage accounts** and click **+ Create**
-2. Fill in the fields:
-   - **Resource group:** select the same resource group as your Foundry project
-   - **Storage account name:** a unique name (e.g., `stworkshopknowledge`)
-   - **Region:** the same region as your Foundry project
-   - **Performance:** Standard
-   - **Redundancy:** LRS (sufficient for the workshop)
-3. Click **Review + Create** → **Create**
-
-### Create the documents container:
-
-1. Open the created Storage Account
-2. In the side menu, go to **Data storage → Containers**
-3. Click **+ Container**
-4. Set the name: `documentos`
-5. Access level: **Private**
-6. Click **Create**
-
-### Upload the documents:
-
-1. Open the `documentos` container
-2. Click **Upload**
-3. Select the files you want to index (PDF, Markdown, TXT, Word, etc.)
-4. Click **Upload**
-
-> 💡 **Tip:** Organize documents into folders within the container for easier management. AI Search can navigate the folder structure automatically.
+> AI Gateway includes a **free tier** for the first 100,000 API requests. See [API Management Pricing](https://azure.microsoft.com/pricing/details/api-management/) for details.
 
 ---
 
-## Step 2 — Create Azure AI Search
+## Prerequisites
 
-AI Search provides the indexing and search infrastructure used by Foundry IQ.
+Before starting, make sure you have:
 
-### In the Azure Portal:
-
-1. Search for **AI Search** and click **+ Create**
-2. Fill in the fields:
-   - **Resource group:** the same as the Foundry project
-   - **Service name:** a unique name (e.g., `search-workshop-knowledge`)
-   - **Region:** the same region as the Foundry project
-   - **Pricing tier:** **Basic** (sufficient for the workshop; the Free tier does not support agentic retrieval)
-3. Click **Review + Create** → **Create**
-
-> ⚠️ **Important:** AI Search and the Storage Account should be in the **same region** for best performance. For proof-of-concept, you can use the **free tier** of AI Search with a free token allocation for agentic retrieval.
-
-> 💡 **Note:** In the new Foundry, you can create or connect the AI Search service directly from the Foundry portal (Step 4), without needing to create it manually first. The manual step is useful if you want more control over the configuration.
+- [ ] An **Azure subscription** ([create one for free](https://azure.microsoft.com/pricing/purchase-options/azure-account))
+- [ ] Permissions to create or reuse an **Azure API Management** instance:
+  - **To create**: `Contributor` or `Owner` on the target resource group (or subscription)
+  - **To reuse existing**: `API Management Service Contributor` (or `Owner`) on the APIM instance
+- [ ] Access to the **Foundry portal Admin console** (e.g., `Azure AI Account Owner` or `Azure AI Owner` on the Foundry resource)
+- [ ] A decision on whether to **create a new** or **reuse an existing** APIM instance
 
 ---
 
-## Step 3 — Deploy an Embedding Model in Foundry
+## Step 1 — Open the AI Gateway Configuration
 
-The embedding model is required to convert text into numerical vectors, enabling semantic search. Foundry IQ automates embedding generation during indexing, but it needs a deployed model.
+![AI Gateway portal steps](../../images/ai-gateway-portal-steps.png)
 
-### Why an embedding model?
-
-- Converts text into high-dimensional vectors that capture **semantic meaning**
-- Allows finding relevant documents even if they don't contain the exact words from the query
-- Foundry IQ uses it automatically for chunking and vector embedding generation
-
-### In the Microsoft Foundry Portal ([ai.azure.com](https://ai.azure.com)):
-
-1. Open your **project**
-2. Go to **Models + endpoints** (side menu)
-3. Click **+ Deploy model** → **Deploy base model**
-4. Search for and select **text-embedding-ada-002** (or **text-embedding-3-small** for better performance)
-5. Set the **deployment name** (e.g., `text-embedding-ada-002`)
-6. Select the capacity (tokens per minute) — the minimum is sufficient for the workshop
-7. Click **Deploy**
-
-> 💡 **Note:** `text-embedding-3-small` is newer and more efficient. Both work. Foundry IQ needs an Azure OpenAI embedding model for agentic retrieval.
+1. Sign in to [Microsoft Foundry](https://ai.azure.com) — make sure the **New Foundry** toggle is **on** (**①** in the screenshot)
+2. In the left panel, click **Admin** (**②**)
+3. Open the **AI Gateway** tab (**③**)
+4. Click **Add AI Gateway** (**④**)
 
 ---
 
-## Step 4 — Create Knowledge Base and Knowledge Sources in Foundry IQ
+## Step 2 — Create or Select an APIM Instance
 
-In the new Foundry, knowledge base creation uses **Foundry IQ**, which automates chunking, embedding, and indexing — and supports **agentic retrieval** (query decomposition, parallel search, reranking, and citations).
+1. Select the **Foundry resource** you want to connect with the gateway
+2. Choose one of:
+   - **Create new** — creates a **Basic v2** SKU instance (suitable for dev/test with SLA support)
+   - **Use existing** — select an instance that meets your organization's requirements
+3. Name the gateway and click **Add**
 
-### In the Microsoft Foundry Portal ([ai.azure.com](https://ai.azure.com)):
+> 💡 **Tip:** For production workloads or higher throughput, consider using an existing APIM instance with **Standard v2** or **Premium v2** tier.
 
-1. Make sure the **New Foundry** toggle is **ON** (top corner)
-2. Open your **project**
-3. In the top menu, click **Build**
+### Requirements for existing APIM instances
 
-### Create/connect the AI Search service:
+If you choose **Use existing**, the instance must:
+- Be in the **same tenant and subscription** as the Foundry resource
+- Use one of the **v2 tiers** (Basic v2, Standard v2, Premium v2)
+- **Not** be already associated with another AI Gateway
+- You must have `API Management Service Contributor` role on it
 
-4. In the **Knowledge** tab:
-   - Click to **create or connect** to an existing AI Search service (from Step 2)
-   - If you haven't created one yet, Foundry can create one for you
-
-### Create a Knowledge Source:
-
-5. Click **Add knowledge source**
-6. Select **Azure Blob Storage** as the source type
-7. Configure the connection:
-   - Select the **Storage Account** from Step 1
-   - Select the `documentos` container
-8. Foundry IQ automatically:
-   - Reads the documents from Storage
-   - Splits them into chunks (automatic document chunking)
-   - Generates vector embeddings using the model from Step 3
-   - Extracts metadata
-   - Indexes everything in AI Search
-
-### Create the Knowledge Base:
-
-9. Still in the **Knowledge** tab, click **Create knowledge base**
-10. Add the knowledge source(s) created above
-11. Configure the retrieval parameters:
-    - **Retrieval reasoning effort:** `low` for the workshop (options: minimal, low, medium)
-    - This controls the level of LLM processing for query planning
-12. Click **Create**
-
-### Wait for indexing:
-
-- Progress is visible on the Knowledge Base page
-- When the status changes to **Ready**, it's ready to use
-- You can configure **recurring indexer runs** for incremental data refresh
-
-> 💡 **Note:** A knowledge base can contain **multiple knowledge sources** (e.g., Blob Storage + SharePoint + web). Multiple agents can **share the same knowledge base**.
+> ⚠️ **Private networks:** If your Foundry resource has public network access disabled, your APIM instance must also be privately accessible (Standard v2/Premium v2 with private endpoint or VNet injection).
 
 ---
 
-## Step 5 — Connect the Knowledge Base to an Agent
+## Step 3 — Verify the Gateway is Provisioned
 
-### In the Foundry Portal (Agents tab):
-
-1. In the **Build** menu, go to the **Agents** tab
-2. Create a new agent or select an existing one
-3. In **Knowledge**, connect the knowledge base created in Step 4
-4. Use the **Playground** to send messages and test the agent
-
-The agent now uses **agentic retrieval** from Foundry IQ:
-- Breaks down complex questions into sub-queries
-- Executes searches in parallel across knowledge sources
-- Performs semantic reranking of results
-- Returns answers with **citations** to source documents
-- Respects **permissions** (ACLs) and Microsoft Purview sensitivity labels
-
-### In the Foundry Playground:
-
-1. Ask questions about the content of your documents
-2. Verify that responses include **citations** with links to the original documents
-3. Test with complex questions that require cross-referencing information from multiple documents
-
-> 📖 For code integration, see: [Connect Foundry IQ to Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/how-to/foundry-iq/)
+1. After clicking **Add**, wait for the gateway to appear in the list with status **Enabled**
+2. If the status shows **Provisioning**, wait a few minutes and refresh the page (Basic v2 typically takes 5-10 minutes)
 
 ---
 
-## Summary of Created Resources
+## Step 4 — Enable Existing Projects
 
-| Resource | Purpose |
-|----------|---------|
-| **Storage Account** + Container | Store original documents |
-| **Azure AI Search** | Indexing and search infrastructure (managed by Foundry IQ) |
-| **Embedding Model** (deployment) | Convert text into semantic vectors (used automatically by Foundry IQ) |
-| **Knowledge Source** (Foundry IQ) | Connection to data store with automatic chunking and embeddings |
-| **Knowledge Base** (Foundry IQ) | Orchestrate agentic retrieval with citations and permissions |
+New projects created after AI Gateway setup are **automatically enabled**. For existing projects:
+
+1. Click the **AI Gateway name** to view associated projects
+2. In the project list, locate the project you want to enable
+3. Check the **Gateway status** column for current status
+4. Click **Add project to gateway** — the status updates to **Enabled**
 
 ---
 
-## Required Environment Variables
+## Step 5 — Verify Traffic Routes Through the Gateway
 
-If you want to use the Knowledge Base via code, add to your `.env` file:
+Confirm that requests are flowing through AI Gateway:
 
-```env
-AZURE_SEARCH_ENDPOINT=https://<search-name>.search.windows.net
-AZURE_SEARCH_KEY=<search-admin-key>
-EMBEDDING_DEPLOYMENT=text-embedding-ada-002
-```
+1. In the **Azure portal**, open the API Management instance connected to your Foundry resource
+2. Go to **Monitoring** → **Metrics** → select **Requests** as the metric
+3. Make a test call to a model deployment in the enabled project
+4. Verify that the request count increments
+5. For detailed logs, go to **Monitoring** → **Logs** and query the **GatewayLogs** table for entries with `200` response code
+
+---
+
+## Step 6 — Configure Token Limits (Optional)
+
+Once AI Gateway is enabled, you can configure governance policies:
+
+1. **Token limits for models** — set TPM (tokens per minute) limits per project or per agent
+2. **Custom agent registration** — add custom agents to the Control Plane for governance
+3. **MCP tool governance** — govern MCP and A2A agent tools through the gateway
+
+> 📖 **Reference:** [Configure token limits for models](https://learn.microsoft.com/azure/foundry/control-plane/how-to-enforce-limits-models)
 
 ---
 
@@ -235,17 +114,29 @@ EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 
 | Issue | Resolution |
 |-------|------------|
-| Indexing fails | Check that AI Search has permissions to access Storage (same region, or configure managed identity) |
-| Poor search results | Increase the **retrieval reasoning effort** (from minimal to medium) in the knowledge base |
-| Knowledge Source not indexing | Verify the embedding model is deployed and accessible in the project |
-| Agent doesn't find documents | Confirm the knowledge base is **Ready** and connected to the agent |
-| "New Foundry" toggle not visible | Make sure you're at [ai.azure.com](https://ai.azure.com) with the new portal enabled |
-| Permission errors | Configure managed identities instead of keys for production environments |
+| AI Gateway doesn't appear after creation | Wait a few minutes and refresh — Basic v2 provisions in 5-10 min |
+| Project shows **Disabled** | Existing projects need manual enabling — click **Add project to gateway** |
+| Requests bypass the gateway | Verify gateway status is **Enabled** for both resource and project |
+| Permission error when creating | Verify `Contributor` or `Owner` role on the resource group |
+| Existing APIM not listed | Check: same tenant, v2 tier, not linked to another gateway, proper RBAC |
+| Token limits don't apply | Verify project is enabled for AI Gateway, then configure limits in Admin console |
+| 500 errors after setup | Wait for provisioning to complete; check APIM **Monitoring** → **Logs** |
 
 ---
 
-## References
+## Clean Up
 
-- [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
-- [Tutorial: Build an end-to-end agentic retrieval solution](https://learn.microsoft.com/azure/search/search-how-to-agentic-retrieval-solution)
-- [Microsoft Foundry Portal](https://ai.azure.com)
+If you created a dedicated APIM instance for this lab:
+
+1. Confirm no other workloads depend on it
+2. Disable the AI Gateway for all projects in the associated Foundry resource
+3. Remove linked resources in the Azure portal
+4. Delete the APIM instance (if not used for other purposes)
+
+---
+
+## Expected Result
+
+- AI Gateway enabled and operational in your Foundry resource
+- Projects connected to the gateway with traffic routing through APIM
+- Ability to configure token limits, quotas, and governance policies

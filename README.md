@@ -88,14 +88,11 @@ foundry-workshop/
 │   │   └── lab02.1-agentes.ipynb      # Lab 2.1: Agents with Agent Service (1 hour)
 │   ├── lab03/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   └── lab03-model-workflows.ipynb # Lab 3: Workflows with LLM (1 hour)
+│   │   └── lab04b-agent-workflows.ipynb # Lab 3: Multi-Agent Workflows (1 hour)
 │   ├── lab04/
-│   │   ├── README.md                  # Step-by-step guide
-│   │   └── lab04b-agent-workflows.ipynb # Lab 4: Multi-Agent Workflows (1 hour)
-│   ├── lab05/
-│   │   └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (guide)
-│   └── lab06/
-│       └── README.md                  # Lab 6: Governance with AI Gateway (guide)
+│   │   └── README.md                  # Lab 4: Knowledge & RAG with Foundry IQ (guide)
+│   └── lab05/
+│       └── README.md                  # Lab 5: Governance with AI Gateway (guide)
 └── data/
     └── documents/                    # Sample documents
 ```
@@ -108,10 +105,9 @@ foundry-workshop/
 | 2 | [Local Agents](labs/lab02/) | 1 hour | Creating local agents, tools, function calling |
 | 2.1 | [Agents with Agent Service](labs/lab02/) | 1 hour | Prompt agents, `AIProjectClient`, Agents Playground |
 | 2.3 | [Hosted Agents](labs/lab02/self-hosted-agents.md) | 1 hour | Hosted agents, containers, custom code on Foundry |
-| 3 | [Workflows with LLM](labs/lab03/) | 1 hour | Prompt chaining, chained pipelines, Workflow Agents |
-| 4 | [Multi-Agent Workflows](labs/lab04/) | 1 hour | ConnectedAgentTool, visual workflows, orchestration |
-| 5 | [Knowledge & RAG](labs/lab05/) | 1 hour | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
-| 6 | [Governance with AI Gateway](labs/lab06/) | 1 hour | AI Gateway, APIM, token limits, quotas, governance |
+| 3 | [Multi-Agent Workflows](labs/lab03/) | 1 hour | ConnectedAgentTool, visual workflows, orchestration |
+| 4 | [Knowledge & RAG](labs/lab04/) | 1 hour | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
+| 5 | [Governance with AI Gateway](labs/lab05/) | 1 hour | AI Gateway, APIM, token limits, quotas, governance |
 
 
 ## 🔧 .env Configuration
