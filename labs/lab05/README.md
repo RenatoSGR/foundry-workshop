@@ -1,146 +1,146 @@
-# Lab 05 — Knowledge Base com Foundry IQ
+# Lab 05 — Knowledge Base with Foundry IQ
 
-Guia passo a passo para criar uma **Knowledge Base** usando **Foundry IQ** no Microsoft Foundry. O Foundry IQ é a camada de conhecimento gerida que liga dados estruturados e não estruturados (Azure Storage, SharePoint, OneLake, web) para que agentes possam aceder a respostas com permissões e citações.
+Step-by-step guide to creating a **Knowledge Base** using **Foundry IQ** in Microsoft Foundry. Foundry IQ is the managed knowledge layer that connects structured and unstructured data (Azure Storage, SharePoint, OneLake, web) so that agents can access answers with permissions and citations.
 
-> 📖 **Referência oficial:** [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
+> 📖 **Official reference:** [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
 
 ---
 
-## Arquitetura (Foundry IQ)
+## Architecture (Foundry IQ)
 
 ```
-Documentos (PDF, MD, Word, etc.)
+Documents (PDF, MD, Word, etc.)
         │
         ▼
 ┌──────────────────────────┐
-│  Azure Storage            │  Armazenamento de documentos
+│  Azure Storage            │  Document storage
 │  (Blob Container)         │
 └──────────┬───────────────┘
            │
            ▼
 ┌──────────────────────────┐
-│  Knowledge Source          │  Conexão ao data store
-│  (Foundry IQ)             │  (chunking + embeddings automáticos)
+│  Knowledge Source          │  Connection to data store
+│  (Foundry IQ)             │  (automatic chunking + embeddings)
 └──────────┬───────────────┘
            │
            ▼
 ┌──────────────────────────┐
-│  Azure AI Search          │  Indexação + pesquisa vetorial
-│  (infraestrutura gerida)  │
+│  Azure AI Search          │  Indexing + vector search
+│  (managed infrastructure) │
 └──────────┬───────────────┘
            │
            ▼
 ┌──────────────────────────┐
 │  Knowledge Base           │  Agentic Retrieval
-│  (Foundry IQ)             │  (multi-query, reranking, citações)
+│  (Foundry IQ)             │  (multi-query, reranking, citations)
 └──────────┬───────────────┘
            │
            ▼
 ┌──────────────────────────┐
-│  Agente                   │  Usa a Knowledge Base para RAG
+│  Agent                    │  Uses Knowledge Base for RAG
 │  (Foundry Agent Service)  │
 └──────────────────────────┘
 ```
 
-### Conceitos-chave do Foundry IQ
+### Key Foundry IQ Concepts
 
-| Componente | Descrição |
-|------------|-----------|
-| **Knowledge Base** | Recurso de topo que orquestra o agentic retrieval. Define quais knowledge sources consultar e parâmetros de comportamento (retrieval reasoning effort: minimal, low, medium). |
-| **Knowledge Source** | Conexão a conteúdo indexado ou remoto (Azure Blob Storage, SharePoint, OneLake, web). Uma knowledge base pode ter múltiplas knowledge sources. |
-| **Agentic Retrieval** | Pipeline multi-query que decompõe perguntas complexas em sub-queries, executa-as em paralelo, faz reranking semântico e devolve respostas unificadas com citações. |
-| **Azure AI Search** | Fornece a infraestrutura subjacente de indexação e pesquisa. É **obrigatório** para o Foundry IQ. |
+| Component | Description |
+|-----------|-------------|
+| **Knowledge Base** | Top-level resource that orchestrates agentic retrieval. Defines which knowledge sources to query and behavior parameters (retrieval reasoning effort: minimal, low, medium). |
+| **Knowledge Source** | Connection to indexed or remote content (Azure Blob Storage, SharePoint, OneLake, web). A knowledge base can have multiple knowledge sources. |
+| **Agentic Retrieval** | Multi-query pipeline that breaks down complex questions into sub-queries, executes them in parallel, performs semantic reranking, and returns unified answers with citations. |
+| **Azure AI Search** | Provides the underlying indexing and search infrastructure. It is **required** for Foundry IQ. |
 
 ---
 
-## Passo 1 — Criar uma Storage Account e Container
+## Step 1 — Create a Storage Account and Container
 
-A Storage Account serve como repositório central dos documentos que vão alimentar a Knowledge Base.
+The Storage Account serves as the central repository for the documents that will feed the Knowledge Base.
 
-### No Portal Azure ([portal.azure.com](https://portal.azure.com)):
+### In the Azure Portal ([portal.azure.com](https://portal.azure.com)):
 
-1. Procura por **Storage accounts** e clica em **+ Create**
-2. Preenche os campos:
-   - **Resource group:** seleciona o mesmo resource group do teu projeto Foundry
-   - **Storage account name:** um nome único (ex: `stworkshopknowledge`)
-   - **Region:** a mesma região do teu projeto Foundry
+1. Search for **Storage accounts** and click **+ Create**
+2. Fill in the fields:
+   - **Resource group:** select the same resource group as your Foundry project
+   - **Storage account name:** a unique name (e.g., `stworkshopknowledge`)
+   - **Region:** the same region as your Foundry project
    - **Performance:** Standard
-   - **Redundancy:** LRS (suficiente para workshop)
-3. Clica **Review + Create** → **Create**
+   - **Redundancy:** LRS (sufficient for the workshop)
+3. Click **Review + Create** → **Create**
 
-### Criar o Container de documentos:
+### Create the documents container:
 
-1. Abre a Storage Account criada
-2. No menu lateral, vai a **Data storage → Containers**
-3. Clica **+ Container**
-4. Define o nome: `documentos`
-5. Nível de acesso: **Private**
-6. Clica **Create**
+1. Open the created Storage Account
+2. In the side menu, go to **Data storage → Containers**
+3. Click **+ Container**
+4. Set the name: `documentos`
+5. Access level: **Private**
+6. Click **Create**
 
-### Upload dos documentos:
+### Upload the documents:
 
-1. Abre o container `documentos`
-2. Clica **Upload**
-3. Seleciona os ficheiros da pasta `data/documentos/` deste repositório
-4. Clica **Upload**
-
----
-
-## Passo 2 — Criar o Azure AI Search
-
-O AI Search fornece a infraestrutura de indexação e pesquisa usada pelo Foundry IQ.
-
-### No Portal Azure:
-
-1. Procura por **AI Search** e clica em **+ Create**
-2. Preenche os campos:
-   - **Resource group:** o mesmo do projeto Foundry
-   - **Service name:** um nome único (ex: `search-workshop-knowledge`)
-   - **Region:** a mesma região do projeto Foundry
-   - **Pricing tier:** **Basic** (suficiente para o workshop)
-3. Clica **Review + Create** → **Create**
-4. Aguarda o deployment concluir
+1. Open the `documentos` container
+2. Click **Upload**
+3. Select the files from the `data/documentos/` folder in this repository
+4. Click **Upload**
 
 ---
 
-## Passo 3 — Configurar a Knowledge Base via Foundry IQ
+## Step 2 — Create Azure AI Search
 
-### No portal Microsoft Foundry ([ai.azure.com](https://ai.azure.com)):
+AI Search provides the indexing and search infrastructure used by Foundry IQ.
 
-1. Certifica-te que o toggle **New Foundry** está ativo no banner superior
-2. Seleciona o teu **projeto**
-3. No menu superior, clica em **Build**
-4. No painel esquerdo, seleciona o separador **Knowledge**
-5. Cria ou liga ao teu Azure AI Search (criado no Passo 2)
-6. Clica em **+ Add knowledge source**:
-   - Seleciona **Azure Blob Storage** como tipo de source
-   - Liga à Storage Account e container `documentos` criados no Passo 1
-   - O Foundry IQ faz automaticamente: chunking, geração de embeddings e indexação
-7. Configura o **Retrieval reasoning effort** (ex: `medium` para melhor qualidade)
-8. Aguarda a indexação concluir
+### In the Azure Portal:
 
----
-
-## Passo 4 — Ligar a Knowledge Base a um Agente
-
-1. No portal Foundry → **Build** → **Agents**
-2. Seleciona um agente existente ou cria um novo
-3. Na configuração do agente, adiciona a **Knowledge Base** como fonte de conhecimento
-4. Guarda as alterações
+1. Search for **AI Search** and click **+ Create**
+2. Fill in the fields:
+   - **Resource group:** the same as the Foundry project
+   - **Service name:** a unique name (e.g., `search-workshop-knowledge`)
+   - **Region:** the same region as the Foundry project
+   - **Pricing tier:** **Basic** (sufficient for the workshop)
+3. Click **Review + Create** → **Create**
+4. Wait for the deployment to complete
 
 ---
 
-## Passo 5 — Testar no Agents Playground
+## Step 3 — Configure the Knowledge Base via Foundry IQ
 
-1. No Agents Playground do agente configurado
-2. Envia perguntas sobre o conteúdo dos documentos carregados
-3. Verifica que as respostas incluem **citações** dos documentos originais
-4. Testa com perguntas complexas para observar o **agentic retrieval** em ação
+### In the Microsoft Foundry portal ([ai.azure.com](https://ai.azure.com)):
+
+1. Make sure the **New Foundry** toggle is active in the top banner
+2. Select your **project**
+3. In the top menu, click **Build**
+4. In the left panel, select the **Knowledge** tab
+5. Create or connect to your Azure AI Search (created in Step 2)
+6. Click **+ Add knowledge source**:
+   - Select **Azure Blob Storage** as the source type
+   - Connect to the Storage Account and `documentos` container created in Step 1
+   - Foundry IQ automatically handles: chunking, embedding generation, and indexing
+7. Configure the **Retrieval reasoning effort** (e.g., `medium` for better quality)
+8. Wait for indexing to complete
 
 ---
 
-## Resultado Esperado
+## Step 4 — Connect the Knowledge Base to an Agent
 
-- Knowledge Base configurada e funcional com Foundry IQ
-- Agente com acesso a documentos via agentic retrieval
-- Respostas com citações dos documentos carregados
+1. In the Foundry portal → **Build** → **Agents**
+2. Select an existing agent or create a new one
+3. In the agent configuration, add the **Knowledge Base** as a knowledge source
+4. Save the changes
+
+---
+
+## Step 5 — Test in the Agents Playground
+
+1. In the Agents Playground of the configured agent
+2. Ask questions about the content of the uploaded documents
+3. Verify that responses include **citations** from the original documents
+4. Test with complex questions to observe **agentic retrieval** in action
+
+---
+
+## Expected Result
+
+- Knowledge Base configured and functional with Foundry IQ
+- Agent with access to documents via agentic retrieval
+- Responses with citations from the uploaded documents

@@ -1,79 +1,79 @@
-# Lab 02 — Agentes no Microsoft Foundry
+# Lab 02 — Agents in Microsoft Foundry
 
-Guia passo a passo para criar agentes com **tools** e com o **Agent Service** no Foundry.
+Step-by-step guide to creating agents with **tools** and with the **Agent Service** in Foundry.
 
-> 📖 **Referência oficial:** [What is Microsoft Foundry Agent Service?](https://learn.microsoft.com/azure/foundry/agents/overview)
-
----
-
-## Parte A — Agentes com a Responses API (lab02)
-
-### Passo 1 — Compreender o Conceito de Agente
-
-Um **Agente** no Foundry é um assistente que pode:
-- Usar **ferramentas** (code interpreter, file search, web search, functions)
-- Manter contexto ao longo de uma conversa
-- Executar ações autonomamente com base em instruções
-
-O Foundry suporta três tipos de agentes:
-- **Prompt agents** — configurados via portal, sem código
-- **Workflow agents** (preview) — orquestração multi-agente visual
-- **Hosted agents** (preview) — containers com código personalizado
-
-### Passo 2 — Criar um Agente via Código
-
-1. Abre o notebook [`lab02-agentes.ipynb`](lab02-agentes.ipynb)
-2. Executa as células por ordem — o notebook demonstra:
-   - Criar um agente com a **Responses API** do Azure OpenAI
-   - Definir **tools** (funções) que o agente pode chamar
-   - Processar **function calling** — o modelo decide quando usar cada ferramenta
-
-### Passo 3 — Testar no Portal (Model Playground)
-
-1. No portal Foundry → **Build** → **Models** → seleciona o deployment `gpt-4o`
-2. No Playground, expande a secção **Tools** e adiciona **Code interpreter** ou uma função personalizada
-3. Envia uma mensagem que exija o uso da ferramenta e observa o fluxo
+> 📖 **Official reference:** [What is Microsoft Foundry Agent Service?](https://learn.microsoft.com/azure/foundry/agents/overview)
 
 ---
 
-## Parte B — Agentes com o Agent Service (lab02.1)
+## Part A — Agents with the Responses API (lab02)
 
-### Passo 1 — Criar um Prompt Agent no Portal
+### Step 1 — Understand the Agent Concept
 
-1. No portal Foundry → **Build** → **Agents**
-2. Clica em **+ New agent** → escolhe **Prompt agent**
-3. Configura:
-   - **Nome**: ex. `assistente-workshop`
-   - **Instructions**: define o comportamento do agente
-   - **Model**: seleciona `gpt-4o`
-4. O agente é criado automaticamente
+An **Agent** in Foundry is an assistant that can:
+- Use **tools** (code interpreter, file search, web search, functions)
+- Maintain context throughout a conversation
+- Execute actions autonomously based on instructions
 
-> ⚠️ **Nota:** Depois de dares nome ao agente, não podes alterá-lo. Em código, referes o agente como `<agent_name>:<version>`.
+Foundry supports three types of agents:
+- **Prompt agents** — configured via the portal, no code required
+- **Workflow agents** (preview) — visual multi-agent orchestration
+- **Hosted agents** (preview) — containers with custom code
 
-### Passo 2 — Adicionar Tools ao Agente
+### Step 2 — Create an Agent via Code
 
-1. Na configuração do agente, secção **Tools**
-2. Adiciona ferramentas disponíveis (Code Interpreter, File Search, Web Search)
-3. Para mais ferramentas, vai a **Build** → **Tools** para explorar o catálogo de ferramentas (incluindo MCP servers)
-4. Guarda as alterações
+1. Open the notebook [`lab02-agentes.ipynb`](lab02-agentes.ipynb)
+2. Run the cells in order — the notebook demonstrates:
+   - Creating an agent with the Azure OpenAI **Responses API**
+   - Defining **tools** (functions) the agent can call
+   - Processing **function calling** — the model decides when to use each tool
 
-### Passo 3 — Testar no Agents Playground
+### Step 3 — Test in the Portal (Model Playground)
 
-1. O **Agents Playground** abre integrado no painel do agente
-2. Envia mensagens e observa o agente a usar as ferramentas
-3. No separador **Code**, podes copiar o código ou abrir diretamente no **VS Code for the Web**
-
-### Passo 4 — Consumir via Código
-
-1. Abre o notebook [`lab02.1-agentes.ipynb`](lab02.1-agentes.ipynb)
-2. Executa as células — o notebook demonstra:
-   - Criar um agente com `AIProjectClient`
-   - Ciclo **Agent → Conversation → Response**
-   - O agente fica visível no portal do Foundry
+1. In the Foundry portal → **Build** → **Models** → select the `gpt-4o` deployment
+2. In the Playground, expand the **Tools** section and add **Code interpreter** or a custom function
+3. Send a message that requires using the tool and observe the flow
 
 ---
 
-## Resultado Esperado
+## Part B — Agents with the Agent Service (lab02.1)
 
-- Agente criado e funcional com tools (function calling)
-- Agente visível e testável no portal do Foundry
+### Step 1 — Create a Prompt Agent in the Portal
+
+1. In the Foundry portal → **Build** → **Agents**
+2. Click **+ New agent** → choose **Prompt agent**
+3. Configure:
+   - **Name**: e.g., `workshop-assistant`
+   - **Instructions**: define the agent's behavior
+   - **Model**: select `gpt-4o`
+4. The agent is created automatically
+
+> ⚠️ **Note:** After naming the agent, you cannot change it. In code, you reference the agent as `<agent_name>:<version>`.
+
+### Step 2 — Add Tools to the Agent
+
+1. In the agent configuration, **Tools** section
+2. Add available tools (Code Interpreter, File Search, Web Search)
+3. For more tools, go to **Build** → **Tools** to explore the tool catalog (including MCP servers)
+4. Save the changes
+
+### Step 3 — Test in the Agents Playground
+
+1. The **Agents Playground** opens integrated in the agent panel
+2. Send messages and observe the agent using the tools
+3. In the **Code** tab, you can copy the code or open directly in **VS Code for the Web**
+
+### Step 4 — Consume via Code
+
+1. Open the notebook [`lab02.1-agentes.ipynb`](lab02.1-agentes.ipynb)
+2. Run the cells — the notebook demonstrates:
+   - Creating an agent with `AIProjectClient`
+   - The **Agent → Conversation → Response** cycle
+   - The agent becomes visible in the Foundry portal
+
+---
+
+## Expected Result
+
+- Agent created and functional with tools (function calling)
+- Agent visible and testable in the Foundry portal

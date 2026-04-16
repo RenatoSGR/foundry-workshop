@@ -1,63 +1,63 @@
 # Lab 04 — Multi-Agent Workflows
 
-Guia passo a passo para criar **workflows multi-agente** com o Foundry Agent Service.
+Step-by-step guide to creating **multi-agent workflows** with the Foundry Agent Service.
 
-> 📖 **Referência oficial:** [Build a workflow in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow)
-
----
-
-## Passo 1 — Compreender Multi-Agent Workflows
-
-No Foundry, podes criar **workflows multi-agente** de duas formas:
-
-1. **Workflow Agents (portal)** — orquestração visual com padrões Sequential, Group Chat, ou Human-in-the-Loop
-2. **Connected Agents (código)** — via `ConnectedAgentTool` no SDK Python, onde um agente principal delega a sub-agentes
+> 📖 **Official reference:** [Build a workflow in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow)
 
 ---
 
-## Passo 2 — Criar os Agentes Especializados no Portal
+## Step 1 — Understand Multi-Agent Workflows
 
-1. No portal Foundry → **Build** → **Agents**
-2. Cria **2-3 prompt agents** especializados, cada um com instruções específicas:
-   - Ex: `agente-pesquisa` — especializado em pesquisa
-   - Ex: `agente-analise` — especializado em análise de dados
-   - Ex: `agente-redacao` — especializado em redigir respostas
-3. Para cada agente, define as **Instructions** e o **Model** (`gpt-4o`)
+In Foundry, you can create **multi-agent workflows** in two ways:
+
+1. **Workflow Agents (portal)** — visual orchestration with Sequential, Group Chat, or Human-in-the-Loop patterns
+2. **Connected Agents (code)** — via `ConnectedAgentTool` in the Python SDK, where a main agent delegates to sub-agents
 
 ---
 
-## Passo 3 — Criar um Workflow Multi-Agente no Portal
+## Step 2 — Create Specialized Agents in the Portal
 
-1. No portal Foundry → **Build** → **Create new workflow**
-2. Escolhe o padrão **Sequential** (ou **Group chat** para colaboração dinâmica)
-3. Adiciona os agentes criados no Passo 2 como nós do workflow:
-   - Clica no **+** → **Invoke agent** → seleciona um agente existente
-   - Repete para cada agente
-4. Configura a ordem de execução e os inputs/outputs
-5. Clica **Save**
-
----
-
-## Passo 4 — Testar o Workflow
-
-1. No editor do workflow, clica em **Run Workflow**
-2. Envia uma mensagem que exija colaboração entre os agentes
-3. Observa cada nó a executar no visualizador
-4. Verifica as respostas na janela de chat
+1. In the Foundry portal → **Build** → **Agents**
+2. Create **2-3 prompt agents** with specific instructions each:
+   - E.g., `research-agent` — specialized in research
+   - E.g., `analysis-agent` — specialized in data analysis
+   - E.g., `writing-agent` — specialized in writing responses
+3. For each agent, define the **Instructions** and the **Model** (`gpt-4o`)
 
 ---
 
-## Passo 5 — Implementar via Código
+## Step 3 — Create a Multi-Agent Workflow in the Portal
 
-1. Abre o notebook [`lab04b-agent-workflows.ipynb`](lab04b-agent-workflows.ipynb)
-2. Executa as células — o notebook demonstra:
-   - Criar agentes via `AIProjectClient`
-   - Ligar agentes com `ConnectedAgentTool`
-   - Orquestrar o workflow multi-agente programaticamente
+1. In the Foundry portal → **Build** → **Create new workflow**
+2. Choose the **Sequential** pattern (or **Group chat** for dynamic collaboration)
+3. Add the agents created in Step 2 as workflow nodes:
+   - Click **+** → **Invoke agent** → select an existing agent
+   - Repeat for each agent
+4. Configure the execution order and inputs/outputs
+5. Click **Save**
 
 ---
 
-## Resultado Esperado
+## Step 4 — Test the Workflow
 
-- Workflow multi-agente funcional com agentes especializados
-- Agentes visíveis e conectados no portal do Foundry
+1. In the workflow editor, click **Run Workflow**
+2. Send a message that requires collaboration between agents
+3. Observe each node executing in the visualizer
+4. Check the responses in the chat window
+
+---
+
+## Step 5 — Implement via Code
+
+1. Open the notebook [`lab04b-agent-workflows.ipynb`](lab04b-agent-workflows.ipynb)
+2. Run the cells — the notebook demonstrates:
+   - Creating agents via `AIProjectClient`
+   - Connecting agents with `ConnectedAgentTool`
+   - Orchestrating the multi-agent workflow programmatically
+
+---
+
+## Expected Result
+
+- Functional multi-agent workflow with specialized agents
+- Agents visible and connected in the Foundry portal
