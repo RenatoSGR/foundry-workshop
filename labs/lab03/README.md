@@ -1,68 +1,60 @@
-# Lab 03 — Agentes no Microsoft Foundry
+# Lab 03 — Workflows com LLM
 
-Guia passo a passo para criar agentes com **tools** e com o **Agent Service** no Foundry v2.
+Guia passo a passo para criar **pipelines de chamadas encadeadas** ao modelo (prompt chaining) no Foundry.
+
+> 📖 **Referência oficial:** [Microsoft Foundry Playgrounds](https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds)
 
 ---
 
-## Parte A — Agentes com a Responses API (lab03)
+## Passo 1 — Compreender Workflows LLM
 
-### Passo 1 — Compreender o Conceito de Agente
+Um **Workflow LLM** é um pipeline onde cada passo usa o modelo para uma tarefa específica:
+- **Passo 1**: Analisar o input (ex: extrair entidades)
+- **Passo 2**: Processar (ex: classificar, traduzir)
+- **Passo 3**: Gerar output final (ex: resumo estruturado)
 
-Um **Agente** no Foundry é um assistente que pode:
-- Usar **ferramentas** (code interpreter, file search, functions)
-- Manter contexto ao longo de uma conversa
-- Executar ações autonomamente com base em instruções
+Cada passo recebe o output do anterior como contexto.
 
-### Passo 2 — Criar um Agente via Código
+---
 
-1. Abre o notebook [`lab03-agentes.ipynb`](lab03-agentes.ipynb)
+## Passo 2 — Testar Prompt Chaining no Playground
+
+1. No portal Foundry → **Build** → **Models** → seleciona o deployment `gpt-4o`
+2. No Playground, testa cada passo individualmente:
+   - Envia um texto e pede ao modelo para **extrair entidades**
+   - Copia o resultado e pede para **classificar**
+   - Copia e pede para **gerar um resumo**
+3. Observa como cada passo transforma a informação
+
+> 💡 **Dica:** Podes usar o **Compare mode** (botão no canto superior direito do Playground) para testar o mesmo prompt em até 3 modelos em simultâneo.
+
+---
+
+## Passo 3 — Automatizar via Código
+
+1. Abre o notebook [`lab03-model-workflows.ipynb`](lab03-model-workflows.ipynb)
 2. Executa as células por ordem — o notebook demonstra:
-   - Criar um agente com a **Responses API** do Azure OpenAI
-   - Definir **tools** (funções) que o agente pode chamar
-   - Processar **function calling** — o modelo decide quando usar cada ferramenta
-
-### Passo 3 — Testar no Portal (Playground)
-
-1. No portal Foundry → **Playgrounds** → **Chat**
-2. Ativa **Tools** e adiciona uma função personalizada
-3. Envia uma mensagem que exija o uso da ferramenta e observa o fluxo
+   - Encadear múltiplas chamadas ao modelo
+   - Passar o output de uma chamada como input da seguinte
+   - Construir pipelines de processamento de texto
 
 ---
 
-## Parte B — Agentes com o Agent Service (lab03.1)
+## Passo 4 — Explorar Workflows no Portal
 
-### Passo 1 — Criar um Agente no Portal
+No Foundry, podes criar **Workflow Agents** que orquestram ações visualmente:
 
-1. No portal Foundry → **Build** → **Agents**
-2. Clica em **+ New agent**
-3. Configura:
-   - **Nome**: ex. `assistente-workshop`
-   - **Instructions**: define o comportamento do agente
-   - **Model**: seleciona `gpt-4o`
-4. Clica **Create**
+1. No portal Foundry → **Build** → clica em **Create new workflow**
+2. Escolhe um template (ex: **Sequential**) ou cria em branco
+3. Adiciona nós de **Invoke agent** encadeados
+4. Liga os outputs de um nó aos inputs do seguinte
+5. Clica **Save** → **Run Workflow** para testar
 
-### Passo 2 — Adicionar Tools ao Agente
-
-1. Na configuração do agente, secção **Tools**
-2. Adiciona ferramentas disponíveis (Code Interpreter, File Search, Functions)
-3. Guarda as alterações
-
-### Passo 3 — Testar no Playground do Agente
-
-1. Usa o **Playground** integrado no painel do agente
-2. Envia mensagens e observa o agente a usar as ferramentas
-
-### Passo 4 — Consumir via Código
-
-1. Abre o notebook [`lab03.1-agentes.ipynb`](lab03.1-agentes.ipynb)
-2. Executa as células — o notebook demonstra:
-   - Criar um agente standard com `AIProjectClient`
-   - Ciclo **Agent → Conversation → Response**
-   - O agente fica visível no portal do Foundry
+> 📖 **Referência:** [Build a workflow in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow)
 
 ---
 
 ## Resultado Esperado
 
-- Agente criado e funcional com tools (function calling)
-- Agente visível e testável no portal do Foundry
+- Pipeline funcional com múltiplas chamadas encadeadas ao modelo
+- Compreensão de como orquestrar prompt chaining via código e via portal

@@ -1,58 +1,146 @@
-# Lab 05 — Multi-Agent Workflows
+# Lab 05 — Knowledge Base com Foundry IQ
 
-Guia passo a passo para criar **workflows multi-agente** com o Foundry Agent Service.
+Guia passo a passo para criar uma **Knowledge Base** usando **Foundry IQ** no Microsoft Foundry. O Foundry IQ é a camada de conhecimento gerida que liga dados estruturados e não estruturados (Azure Storage, SharePoint, OneLake, web) para que agentes possam aceder a respostas com permissões e citações.
 
----
-
-## Passo 1 — Compreender Multi-Agent Workflows
-
-No Foundry, podes criar **workflows multi-agente server-side** onde:
-- Vários agentes especializados colaboram numa tarefa
-- Um **orquestrador** delega sub-tarefas a agentes conectados
-- Os agentes comunicam via **Connected Agents** (ConnectedAgentTool)
+> 📖 **Referência oficial:** [What is Foundry IQ?](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
 
 ---
 
-## Passo 2 — Criar os Agentes Especializados no Portal
+## Arquitetura (Foundry IQ)
+
+```
+Documentos (PDF, MD, Word, etc.)
+        │
+        ▼
+┌──────────────────────────┐
+│  Azure Storage            │  Armazenamento de documentos
+│  (Blob Container)         │
+└──────────┬───────────────┘
+           │
+           ▼
+┌──────────────────────────┐
+│  Knowledge Source          │  Conexão ao data store
+│  (Foundry IQ)             │  (chunking + embeddings automáticos)
+└──────────┬───────────────┘
+           │
+           ▼
+┌──────────────────────────┐
+│  Azure AI Search          │  Indexação + pesquisa vetorial
+│  (infraestrutura gerida)  │
+└──────────┬───────────────┘
+           │
+           ▼
+┌──────────────────────────┐
+│  Knowledge Base           │  Agentic Retrieval
+│  (Foundry IQ)             │  (multi-query, reranking, citações)
+└──────────┬───────────────┘
+           │
+           ▼
+┌──────────────────────────┐
+│  Agente                   │  Usa a Knowledge Base para RAG
+│  (Foundry Agent Service)  │
+└──────────────────────────┘
+```
+
+### Conceitos-chave do Foundry IQ
+
+| Componente | Descrição |
+|------------|-----------|
+| **Knowledge Base** | Recurso de topo que orquestra o agentic retrieval. Define quais knowledge sources consultar e parâmetros de comportamento (retrieval reasoning effort: minimal, low, medium). |
+| **Knowledge Source** | Conexão a conteúdo indexado ou remoto (Azure Blob Storage, SharePoint, OneLake, web). Uma knowledge base pode ter múltiplas knowledge sources. |
+| **Agentic Retrieval** | Pipeline multi-query que decompõe perguntas complexas em sub-queries, executa-as em paralelo, faz reranking semântico e devolve respostas unificadas com citações. |
+| **Azure AI Search** | Fornece a infraestrutura subjacente de indexação e pesquisa. É **obrigatório** para o Foundry IQ. |
+
+---
+
+## Passo 1 — Criar uma Storage Account e Container
+
+A Storage Account serve como repositório central dos documentos que vão alimentar a Knowledge Base.
+
+### No Portal Azure ([portal.azure.com](https://portal.azure.com)):
+
+1. Procura por **Storage accounts** e clica em **+ Create**
+2. Preenche os campos:
+   - **Resource group:** seleciona o mesmo resource group do teu projeto Foundry
+   - **Storage account name:** um nome único (ex: `stworkshopknowledge`)
+   - **Region:** a mesma região do teu projeto Foundry
+   - **Performance:** Standard
+   - **Redundancy:** LRS (suficiente para workshop)
+3. Clica **Review + Create** → **Create**
+
+### Criar o Container de documentos:
+
+1. Abre a Storage Account criada
+2. No menu lateral, vai a **Data storage → Containers**
+3. Clica **+ Container**
+4. Define o nome: `documentos`
+5. Nível de acesso: **Private**
+6. Clica **Create**
+
+### Upload dos documentos:
+
+1. Abre o container `documentos`
+2. Clica **Upload**
+3. Seleciona os ficheiros da pasta `data/documentos/` deste repositório
+4. Clica **Upload**
+
+---
+
+## Passo 2 — Criar o Azure AI Search
+
+O AI Search fornece a infraestrutura de indexação e pesquisa usada pelo Foundry IQ.
+
+### No Portal Azure:
+
+1. Procura por **AI Search** e clica em **+ Create**
+2. Preenche os campos:
+   - **Resource group:** o mesmo do projeto Foundry
+   - **Service name:** um nome único (ex: `search-workshop-knowledge`)
+   - **Region:** a mesma região do projeto Foundry
+   - **Pricing tier:** **Basic** (suficiente para o workshop)
+3. Clica **Review + Create** → **Create**
+4. Aguarda o deployment concluir
+
+---
+
+## Passo 3 — Configurar a Knowledge Base via Foundry IQ
+
+### No portal Microsoft Foundry ([ai.azure.com](https://ai.azure.com)):
+
+1. Certifica-te que o toggle **New Foundry** está ativo no banner superior
+2. Seleciona o teu **projeto**
+3. No menu superior, clica em **Build**
+4. No painel esquerdo, seleciona o separador **Knowledge**
+5. Cria ou liga ao teu Azure AI Search (criado no Passo 2)
+6. Clica em **+ Add knowledge source**:
+   - Seleciona **Azure Blob Storage** como tipo de source
+   - Liga à Storage Account e container `documentos` criados no Passo 1
+   - O Foundry IQ faz automaticamente: chunking, geração de embeddings e indexação
+7. Configura o **Retrieval reasoning effort** (ex: `medium` para melhor qualidade)
+8. Aguarda a indexação concluir
+
+---
+
+## Passo 4 — Ligar a Knowledge Base a um Agente
 
 1. No portal Foundry → **Build** → **Agents**
-2. Cria **2-3 agentes** especializados, cada um com instruções específicas:
-   - Ex: `agente-pesquisa` — especializado em pesquisa
-   - Ex: `agente-analise` — especializado em análise de dados
-   - Ex: `agente-redacao` — especializado em redigir respostas
-3. Para cada agente, define as **instructions** e o **modelo**
+2. Seleciona um agente existente ou cria um novo
+3. Na configuração do agente, adiciona a **Knowledge Base** como fonte de conhecimento
+4. Guarda as alterações
 
 ---
 
-## Passo 3 — Criar o Agente Orquestrador
+## Passo 5 — Testar no Agents Playground
 
-1. Cria um novo agente: `orquestrador`
-2. Nas **Tools**, adiciona **Connected Agents**:
-   - Seleciona os agentes criados no Passo 2
-   - Define quando cada agente deve ser invocado
-3. Nas **Instructions**, explica ao orquestrador como delegar tarefas
-
----
-
-## Passo 4 — Testar no Playground
-
-1. Abre o **Playground** do agente orquestrador
-2. Envia uma mensagem que exija colaboração entre agentes
-3. Observa o orquestrador a delegar e a compilar as respostas
-
----
-
-## Passo 5 — Implementar via Código
-
-1. Abre o notebook [`lab05b-agent-workflows.ipynb`](lab05b-agent-workflows.ipynb)
-2. Executa as células — o notebook demonstra:
-   - Criar agentes via `AIProjectClient`
-   - Ligar agentes com `ConnectedAgentTool`
-   - Orquestrar o workflow multi-agente programaticamente
+1. No Agents Playground do agente configurado
+2. Envia perguntas sobre o conteúdo dos documentos carregados
+3. Verifica que as respostas incluem **citações** dos documentos originais
+4. Testa com perguntas complexas para observar o **agentic retrieval** em ação
 
 ---
 
 ## Resultado Esperado
 
-- Workflow multi-agente funcional com orquestrador e agentes especializados
-- Agentes visíveis e conectados no portal do Foundry
+- Knowledge Base configurada e funcional com Foundry IQ
+- Agente com acesso a documentos via agentic retrieval
+- Respostas com citações dos documentos carregados

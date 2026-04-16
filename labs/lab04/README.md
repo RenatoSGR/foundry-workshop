@@ -1,52 +1,63 @@
-# Lab 04 — Workflows com LLM
+# Lab 04 — Multi-Agent Workflows
 
-Guia passo a passo para criar **pipelines de chamadas encadeadas** ao modelo (prompt chaining) no Foundry v2.
+Guia passo a passo para criar **workflows multi-agente** com o Foundry Agent Service.
 
----
-
-## Passo 1 — Compreender Workflows LLM
-
-Um **Workflow LLM** é um pipeline onde cada passo usa o modelo para uma tarefa específica:
-- **Passo 1**: Analisar o input (ex: extrair entidades)
-- **Passo 2**: Processar (ex: classificar, traduzir)
-- **Passo 3**: Gerar output final (ex: resumo estruturado)
-
-Cada passo recebe o output do anterior como contexto.
+> 📖 **Referência oficial:** [Build a workflow in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow)
 
 ---
 
-## Passo 2 — Testar Prompt Chaining no Playground
+## Passo 1 — Compreender Multi-Agent Workflows
 
-1. No portal Foundry → **Playgrounds** → **Chat**
-2. Testa cada passo individualmente:
-   - Envia um texto e pede ao modelo para **extrair entidades**
-   - Copia o resultado e pede para **classificar**
-   - Copia e pede para **gerar um resumo**
-3. Observa como cada passo transforma a informação
+No Foundry, podes criar **workflows multi-agente** de duas formas:
+
+1. **Workflow Agents (portal)** — orquestração visual com padrões Sequential, Group Chat, ou Human-in-the-Loop
+2. **Connected Agents (código)** — via `ConnectedAgentTool` no SDK Python, onde um agente principal delega a sub-agentes
 
 ---
 
-## Passo 3 — Automatizar via Código
+## Passo 2 — Criar os Agentes Especializados no Portal
 
-1. Abre o notebook [`lab04-model-workflows.ipynb`](lab04-model-workflows.ipynb)
-2. Executa as células por ordem — o notebook demonstra:
-   - Encadear múltiplas chamadas ao modelo
-   - Passar o output de uma chamada como input da seguinte
-   - Construir pipelines de processamento de texto
+1. No portal Foundry → **Build** → **Agents**
+2. Cria **2-3 prompt agents** especializados, cada um com instruções específicas:
+   - Ex: `agente-pesquisa` — especializado em pesquisa
+   - Ex: `agente-analise` — especializado em análise de dados
+   - Ex: `agente-redacao` — especializado em redigir respostas
+3. Para cada agente, define as **Instructions** e o **Model** (`gpt-4o`)
 
 ---
 
-## Passo 4 — Explorar no Portal (Prompt Flow)
+## Passo 3 — Criar um Workflow Multi-Agente no Portal
 
-1. No portal Foundry → **Build** → **Prompt flow**
-2. Cria um novo flow a partir de um template ou em branco
-3. Adiciona nós de **LLM** encadeados
-4. Liga os outputs de um nó aos inputs do seguinte
-5. Testa o flow completo no playground integrado
+1. No portal Foundry → **Build** → **Create new workflow**
+2. Escolhe o padrão **Sequential** (ou **Group chat** para colaboração dinâmica)
+3. Adiciona os agentes criados no Passo 2 como nós do workflow:
+   - Clica no **+** → **Invoke agent** → seleciona um agente existente
+   - Repete para cada agente
+4. Configura a ordem de execução e os inputs/outputs
+5. Clica **Save**
+
+---
+
+## Passo 4 — Testar o Workflow
+
+1. No editor do workflow, clica em **Run Workflow**
+2. Envia uma mensagem que exija colaboração entre os agentes
+3. Observa cada nó a executar no visualizador
+4. Verifica as respostas na janela de chat
+
+---
+
+## Passo 5 — Implementar via Código
+
+1. Abre o notebook [`lab04b-agent-workflows.ipynb`](lab04b-agent-workflows.ipynb)
+2. Executa as células — o notebook demonstra:
+   - Criar agentes via `AIProjectClient`
+   - Ligar agentes com `ConnectedAgentTool`
+   - Orquestrar o workflow multi-agente programaticamente
 
 ---
 
 ## Resultado Esperado
 
-- Pipeline funcional com múltiplas chamadas encadeadas ao modelo
-- Compreensão de como orquestrar prompt chaining via código e via portal
+- Workflow multi-agente funcional com agentes especializados
+- Agentes visíveis e conectados no portal do Foundry

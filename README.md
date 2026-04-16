@@ -1,48 +1,53 @@
-# 🚀 Workshop Microsoft Foundry - Iniciação (2 horas)
 
-> **Repositório:** [https://github.com/RenatoSGR/foundry-workshop](https://github.com/RenatoSGR/foundry-workshop)
+# Microsoft Foundry Workshop — Getting Started
 
-## Sobre este Workshop
+![Microsoft Foundry as AI Platform](images/banner.png)
 
-Workshop prático de introdução ao **Microsoft Foundry** (v2), desenhado para participantes com poucas noções prévias. Em 2 horas, vais explorar modelos de IA, criar agentes inteligentes, configurar RAG com AI Search e muito mais.
+> **Repository:** [https://github.com/RenatoSGR/foundry-workshop](https://github.com/RenatoSGR/foundry-workshop)
 
-## 📋 Pré-requisitos
+## About this Workshop
 
-Antes do workshop, certifica-te que tens:
+A hands-on introductory workshop on **Microsoft Foundry**, designed for participants with little prior experience. You'll explore AI models, create intelligent agents, configure RAG with Foundry IQ, and much more.
 
-- [ ] Uma conta Azure com uma **subscrição ativa** ([criar conta gratuita](https://azure.microsoft.com/free/))
-- [ ] Um **projeto Microsoft Foundry** já criado ([portal](https://ai.azure.com))
-- [ ] Um modelo **GPT-4o** deployado no projeto (deployment name: `gpt-4o`)
-- [ ] Um modelo **text-embedding-ada-002** deployado (deployment name: `text-embedding-ada-002`)
-- [ ] **Python 3.10+** instalado (já incluído no Codespaces)
-- [ ] **Azure CLI** instalado e autenticado (`az login`) — opcional, permite auto-descoberta
-- [ ] **VS Code** instalado (recomendado) com extensão Jupyter
-- [ ] **Git** instalado
+> **Note:** This workshop uses the **new Foundry portal** (toggle "New Foundry" enabled at [ai.azure.com](https://ai.azure.com)). Make sure the toggle is active before you begin.
 
-## ⚡ Setup Rápido (5 minutos)
+## 📋 Prerequisites
 
-### Opção A: GitHub Codespaces (mais rápido) ☁️
+Before the workshop, make sure you have:
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/RenatoSGR/foundry-workshop/codespaces/new)
+- [ ] An Azure account with an **active subscription** ([create a free account](https://azure.microsoft.com/free/))
+- [ ] A **Microsoft Foundry project** already created ([portal](https://ai.azure.com))
+- [ ] A **GPT-4o** model deployed in the project (deployment name: `gpt-4o`)
+- [ ] A **text-embedding-ada-002** model deployed (deployment name: `text-embedding-ada-002`)
+- [ ] **Python 3.10+** installed (already included in Codespaces)
+- [ ] **Azure CLI** installed and authenticated (`az login`) — optional, enables auto-discovery
+- [ ] **VS Code** installed (recommended) with Jupyter extension
+- [ ] **Git** installed
 
-1. Clica no botão acima (ou vai a **Code → Codespaces → New codespace**)
-2. Espera que o ambiente carregue (as dependências instalam-se automaticamente)
-3. No terminal, executa:
+## ⚡ Quick Setup (5 minutes)
+
+### Option A: GitHub Codespaces (fastest) ☁️
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/RenatoSGR/foundry-workshop?machine=basicLinux32gb)
+
+1. Click the button above (or go to the repository on GitHub → **Code** → **Codespaces** → **Create codespace on main**)
+2. Wait for the environment to load (dependencies install automatically)
+3. In the terminal, run:
    ```bash
    python setup_env.py
    ```
-4. O script pede-te os valores do portal ([ai.azure.com](https://ai.azure.com) → teu projeto → Overview)
+4. The script will ask for values from the portal ([ai.azure.com](https://ai.azure.com) → your project → **Build** → **Models** for endpoints)
 
-> No Codespaces a Azure CLI já vem instalada. Se fizeres `az login`, o script descobre tudo automaticamente.
+> In Codespaces, Azure CLI comes pre-installed. If you run `az login`, the script discovers everything automatically.
 
-### Opção B: Local
+### Option B: Local
 
 ```bash
-# 1. Clona o repositório
+# 1. Clone the repository
 git clone https://github.com/RenatoSGR/foundry-workshop.git
 cd foundry-workshop
 
-# 2. Cria ambiente virtual
+# 2. Create a virtual environment
 python -m venv .venv
 
 # Windows
@@ -51,101 +56,121 @@ python -m venv .venv
 # macOS/Linux
 source .venv/bin/activate
 
-# 3. Instala dependências
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Configura o .env
+# 4. Configure .env
 python setup_env.py
 ```
 
-O script `setup_env.py` funciona em **dois modos**:
-- **Com Azure CLI** (`az login`): descobre automaticamente o teu projeto, extrai endpoints e keys
-- **Sem Azure CLI** (Codespaces, etc.): pede os valores manualmente — copia do portal [ai.azure.com](https://ai.azure.com)
+The `setup_env.py` script works in **two modes**:
+- **With Azure CLI** (`az login`): automatically discovers your project, extracts endpoints and keys
+- **Without Azure CLI** (Codespaces, etc.): prompts for values manually — copy from the portal at [ai.azure.com](https://ai.azure.com)
 
-> **Alternativa manual:** Copia `.env.template` para `.env` e preenche os valores à mão.
+> **Manual alternative:** Copy `.env.template` to `.env` and fill in the values by hand.
 
-## 📁 Estrutura do Repositório
+## 📁 Repository Structure
 
 ```
 foundry-workshop/
-├── README.md                          # Este ficheiro
-├── requirements.txt                   # Dependências Python
-├── setup_env.py                       # Script automático de configuração
-├── .env.template                      # Template de configuração (manual)
+├── README.md                          # This file
+├── requirements.txt                   # Python dependencies
+├── setup_env.py                       # Automatic configuration script
+├── .env.template                      # Configuration template (manual)
 ├── labs/
+│   ├── lab01/
+│   │   ├── README.md                  # Step-by-step guide
+│   │   └── lab01-modelos.ipynb        # Lab 1: Models and Deployments (15 min)
 │   ├── lab02/
-│   │   ├── README.md                  # Guia passo a passo
-│   │   └── lab02-modelos.ipynb        # Lab 2: Modelos e Deployments (15 min)
+│   │   ├── README.md                  # Step-by-step guide
+│   │   ├── lab02-agentes.ipynb        # Lab 2: Agents with Tools (15 min)
+│   │   └── lab02.1-agentes.ipynb      # Lab 2.1: Agents with Agent Service (15 min)
 │   ├── lab03/
-│   │   ├── README.md                  # Guia passo a passo
-│   │   ├── lab03-agentes.ipynb        # Lab 3: Agentes com Tools (15 min)
-│   │   └── lab03.1-agentes.ipynb      # Lab 3.1: Agentes com Foundry v2 SDK (15 min)
+│   │   ├── README.md                  # Step-by-step guide
+│   │   └── lab03-model-workflows.ipynb # Lab 3: Workflows with LLM (15 min)
 │   ├── lab04/
-│   │   ├── README.md                  # Guia passo a passo
-│   │   └── lab04-model-workflows.ipynb # Lab 4: Workflows com LLM (15 min)
-│   ├── lab05/
-│   │   ├── README.md                  # Guia passo a passo
-│   │   └── lab05b-agent-workflows.ipynb # Lab 5: Multi-Agent Workflows (15 min)
-│   └── lab06/
-│       └── README.md                  # Lab 6: Knowledge & RAG (guia)
+│   │   ├── README.md                  # Step-by-step guide
+│   │   └── lab04b-agent-workflows.ipynb # Lab 4: Multi-Agent Workflows (15 min)
+│   └── lab05/
+│       └── README.md                  # Lab 5: Knowledge & RAG with Foundry IQ (guide)
 └── data/
-    └── documentos/
-        └── exemplo.md                 # Documento exemplo para RAG
+    └── documentos/                    # Sample documents for RAG
 ```
 
 ## 🗺️ Agenda
 
-| # | Lab | Duração | Tópicos |
-|---|-----|---------|---------|
-| 2 | Modelos e Deployment | 15 min | Deploy de modelos, consumir via código, chat completions |
-| 3 | Agentes | 15 min | Criar agentes, tools, agent framework |
-| 3.1 | Agentes Foundry v2 | 15 min | Agentes server-side com `AIProjectClient`, Responses API |
-| 4 | Workflows com LLM | 15 min | Pipelines de chamadas encadeadas ao modelo (prompt chaining) |
-| 5b | Multi-Agent Workflows | 15 min | ConnectedAgentTool, orquestrador, Workflow Agent (preview) |
-| 6 | Knowledge & RAG | 15 min | RAG, AI Search, grounding (guia) |
-| - | Conclusões | 5 min | Recap e próximos passos |
+| # | Lab | Duration | Topics |
+|---|-----|----------|--------|
+| 1 | [Models and Deployment](labs/lab01/) | 15 min | Model deployment, consuming via code, chat completions |
+| 2 | [Agents](labs/lab02/) | 15 min | Creating agents, tools, function calling |
+| 2.1 | [Agents with Agent Service](labs/lab02/) | 15 min | Prompt agents, `AIProjectClient`, Agents Playground |
+| 3 | [Workflows with LLM](labs/lab03/) | 15 min | Prompt chaining, chained pipelines, Workflow Agents |
+| 4 | [Multi-Agent Workflows](labs/lab04/) | 15 min | ConnectedAgentTool, visual workflows, orchestration |
+| 5 | [Knowledge & RAG](labs/lab05/) | 15 min | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |
+| - | Wrap-up | 5 min | Recap and next steps |
 
-## 🔧 Configuração do .env
+## 🔧 .env Configuration
 
-### Opção 1: Automática (recomendado) 🚀
+### Option 1: Automatic (recommended) 🚀
 
 ```bash
 python setup_env.py
 ```
 
-O script faz tudo por ti:
-1. Verifica que estás autenticado na Azure CLI
-2. Lista os teus projetos AI Foundry e pede-te para escolher
-3. Extrai o endpoint e key do AI Services associado
-4. Deteta AI Search (se existir) e extrai endpoint/key
-5. Gera o ficheiro `.env` pronto a usar
+The script handles everything for you:
+1. Verifies you're authenticated with Azure CLI
+2. Lists your Foundry projects and asks you to choose
+3. Extracts the endpoint and key from the associated AI Services
+4. Detects AI Search (if available) and extracts endpoint/key
+5. Generates the `.env` file ready to use
 
-### Opção 2: Manual
+### Option 2: Manual
 
-Copia `.env.template` para `.env` e preenche:
+Copy `.env.template` to `.env` and fill in:
 
-| Variável | Onde encontrar |
+| Variable | Where to find |
 |----------|---------------|
-| `AZURE_AI_FOUNDRY_ENDPOINT` | Portal Foundry → Project → Overview → Endpoint |
-| `AZURE_AI_FOUNDRY_KEY` | Portal Foundry → Project → Overview → Keys |
-| `MODEL_DEPLOYMENT` | Nome do deployment do modelo de chat (ex: `gpt-4o`) |
-| `EMBEDDING_DEPLOYMENT` | Nome do deployment de embeddings (ex: `text-embedding-ada-002`) |
-| `AZURE_SEARCH_ENDPOINT` | Portal Azure → AI Search → Overview → URL |
-| `AZURE_SEARCH_KEY` | Portal Azure → AI Search → Keys → Admin Key |
+| `AZURE_AI_FOUNDRY_ENDPOINT` | Foundry Portal → your project → **Build** → **Models** → Endpoint |
+| `AZURE_AI_FOUNDRY_KEY` | Foundry Portal → your project → **Operate** → **Admin** → Keys |
+| `MODEL_DEPLOYMENT` | Chat model deployment name (e.g., `gpt-4o`) |
+| `EMBEDDING_DEPLOYMENT` | Embeddings deployment name (e.g., `text-embedding-ada-002`) |
+| `AZURE_SEARCH_ENDPOINT` | Azure Portal → AI Search → Overview → URL |
+| `AZURE_SEARCH_KEY` | Azure Portal → AI Search → Keys → Admin Key |
 
-> **Nota:** No Foundry v2, precisas apenas de **um endpoint e uma key** para tudo (chat, embeddings, agentes). Já não é necessário configurar variáveis `AZURE_OPENAI_*` separadas.
+> **Note:** In Foundry, you only need **one endpoint and one key** for everything (chat, embeddings, agents). There's no need to configure separate `AZURE_OPENAI_*` variables.
 
-## 💡 Dicas
+## 🧭 Foundry Portal Navigation (Quick Reference)
 
-- **Não te preocupes com código complexo** — os notebooks estão prontos, só precisas de executar `python setup_env.py`
-- **Segue os passos por ordem** — cada lab constrói sobre o anterior
-- **Em caso de erro** — verifica se o `.env` está correcto e se os modelos estão deployados
-- **Pede ajuda** — o instrutor está cá para isso!
+The new Foundry portal has its main navigation in the **top menu**:
 
-## 📚 Recursos Adicionais
+| Menu | What you'll find |
+|------|-----------------|
+| **Home** | Project home page |
+| **Discover** → **Models** | Model catalog (deploy new models) |
+| **Build** → **Models** | Existing deployments and Playground |
+| **Build** → **Agents** | Create and manage agents (Prompt, Workflow, Hosted) |
+| **Build** → **Tools** | Tool catalog (MCP servers, functions) |
+| **Build** → **Knowledge** | Foundry IQ — knowledge bases and sources |
+| **Operate** → **Tracing** | Monitoring and agent tracing |
+| **Operate** → **Quota** | Quota management |
+| **Operate** → **Admin** | Users, permissions, resources |
 
-- [Documentação Microsoft Foundry](https://learn.microsoft.com/azure/ai-studio/)
+> 📖 **Reference:** [Migrate from the Foundry (classic) portal](https://learn.microsoft.com/azure/foundry/how-to/navigate-from-classic)
+
+## 💡 Tips
+
+- **Don't worry about complex code** — the notebooks are ready to go, just run `python setup_env.py`
+- **Follow the steps in order** — each lab builds on the previous one
+- **If you get an error** — check that `.env` is correct and the models are deployed
+- **New Foundry toggle** — make sure it's active in the portal's top banner
+- **Ask for help** — the instructor is here for that!
+
+## 📚 Additional Resources
+
+- [Microsoft Foundry Documentation](https://learn.microsoft.com/azure/foundry/)
 - [Microsoft Foundry Portal](https://ai.azure.com)
+- [Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/overview)
+- [Foundry IQ (Knowledge)](https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-foundry-iq)
 - [SDK azure-ai-projects](https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme)
-- [SDK azure-ai-inference](https://learn.microsoft.com/python/api/overview/azure/ai-inference-readme)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/)
+- [Foundry Playgrounds](https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds)

@@ -1,59 +1,79 @@
-# Lab 02 — Modelos e Deployment
+# Lab 02 — Agentes no Microsoft Foundry
 
-Guia passo a passo para deployar e consumir modelos no **Microsoft Foundry v2**.
+Guia passo a passo para criar agentes com **tools** e com o **Agent Service** no Foundry.
 
----
-
-## Passo 1 — Aceder ao Catálogo de Modelos
-
-1. Abre o portal **Microsoft Foundry** → [ai.azure.com](https://ai.azure.com)
-2. Seleciona o teu **projeto**
-3. No menu lateral, clica em **Models + endpoints**
-4. Explora o catálogo — estão disponíveis 11000+ modelos (OpenAI, Meta, Mistral, etc.)
+> 📖 **Referência oficial:** [What is Microsoft Foundry Agent Service?](https://learn.microsoft.com/azure/foundry/agents/overview)
 
 ---
 
-## Passo 2 — Deployar um Modelo de Chat (GPT-4o)
+## Parte A — Agentes com a Responses API (lab02)
 
-1. Em **Models**, clica em **+ Deploy model** → **Deploy base model**
-2. Procura por **GPT-4o** e seleciona-o
-3. Define o **Deployment name**: `gpt-4o`
-4. Escolhe a capacidade de tokens por minuto (o mínimo é suficiente para o workshop)
-5. Clica **Deploy**
-6. Aguarda até o estado mudar para **Succeeded**
+### Passo 1 — Compreender o Conceito de Agente
+
+Um **Agente** no Foundry é um assistente que pode:
+- Usar **ferramentas** (code interpreter, file search, web search, functions)
+- Manter contexto ao longo de uma conversa
+- Executar ações autonomamente com base em instruções
+
+O Foundry suporta três tipos de agentes:
+- **Prompt agents** — configurados via portal, sem código
+- **Workflow agents** (preview) — orquestração multi-agente visual
+- **Hosted agents** (preview) — containers com código personalizado
+
+### Passo 2 — Criar um Agente via Código
+
+1. Abre o notebook [`lab02-agentes.ipynb`](lab02-agentes.ipynb)
+2. Executa as células por ordem — o notebook demonstra:
+   - Criar um agente com a **Responses API** do Azure OpenAI
+   - Definir **tools** (funções) que o agente pode chamar
+   - Processar **function calling** — o modelo decide quando usar cada ferramenta
+
+### Passo 3 — Testar no Portal (Model Playground)
+
+1. No portal Foundry → **Build** → **Models** → seleciona o deployment `gpt-4o`
+2. No Playground, expande a secção **Tools** e adiciona **Code interpreter** ou uma função personalizada
+3. Envia uma mensagem que exija o uso da ferramenta e observa o fluxo
 
 ---
 
-## Passo 3 — Deployar um Modelo de Embeddings
+## Parte B — Agentes com o Agent Service (lab02.1)
 
-1. Repete o processo: **+ Deploy model** → **Deploy base model**
-2. Procura por **text-embedding-ada-002** (ou `text-embedding-3-small`)
-3. Define o **Deployment name**: `text-embedding-ada-002`
-4. Clica **Deploy**
+### Passo 1 — Criar um Prompt Agent no Portal
 
----
+1. No portal Foundry → **Build** → **Agents**
+2. Clica em **+ New agent** → escolhe **Prompt agent**
+3. Configura:
+   - **Nome**: ex. `assistente-workshop`
+   - **Instructions**: define o comportamento do agente
+   - **Model**: seleciona `gpt-4o`
+4. O agente é criado automaticamente
 
-## Passo 4 — Testar no Playground
+> ⚠️ **Nota:** Depois de dares nome ao agente, não podes alterá-lo. Em código, referes o agente como `<agent_name>:<version>`.
 
-1. Em **Models**, clica no deployment `gpt-4o`
-2. Abre o **Playground** (botão no topo)
-3. Envia uma mensagem de teste (ex: "Olá, como estás?")
-4. Verifica que o modelo responde corretamente
+### Passo 2 — Adicionar Tools ao Agente
 
----
+1. Na configuração do agente, secção **Tools**
+2. Adiciona ferramentas disponíveis (Code Interpreter, File Search, Web Search)
+3. Para mais ferramentas, vai a **Build** → **Tools** para explorar o catálogo de ferramentas (incluindo MCP servers)
+4. Guarda as alterações
 
-## Passo 5 — Consumir via Código (Notebook)
+### Passo 3 — Testar no Agents Playground
 
-1. Abre o notebook [`lab02-modelos.ipynb`](lab02-modelos.ipynb)
-2. Certifica-te que o `.env` está configurado (`python setup_env.py`)
-3. Executa as células por ordem — o notebook demonstra:
-   - Ligar ao endpoint com `azure-ai-inference`
-   - Fazer chamadas de **chat completions**
-   - Ajustar parâmetros (`temperature`, `max_tokens`, etc.)
+1. O **Agents Playground** abre integrado no painel do agente
+2. Envia mensagens e observa o agente a usar as ferramentas
+3. No separador **Code**, podes copiar o código ou abrir diretamente no **VS Code for the Web**
+
+### Passo 4 — Consumir via Código
+
+1. Abre o notebook [`lab02.1-agentes.ipynb`](lab02.1-agentes.ipynb)
+2. Executa as células — o notebook demonstra:
+   - Criar um agente com `AIProjectClient`
+   - Ciclo **Agent → Conversation → Response**
+   - O agente fica visível no portal do Foundry
 
 ---
 
 ## Resultado Esperado
 
-- Dois modelos deployados e operacionais no Foundry
-- Respostas do modelo via Playground e via código Python
+- Agente criado e funcional com tools (function calling)
+- Agente visível e testável no portal do Foundry
