@@ -83,7 +83,8 @@ foundry-workshop/
 │   │   └── lab01-modelos.ipynb        # Lab 1: Models and Deployments (1 hour)
 │   ├── lab02/
 │   │   ├── README.md                  # Step-by-step guide
-│   │   ├── lab02-agentes.ipynb        # Lab 2: Agents with Tools (1 hour)
+│   │   ├── self-hosted-agents.md      # Lab 2.3: Hosted Agents guide
+│   │   ├── lab02-agentes.ipynb        # Lab 2: Local Agents with Tools (1 hour)
 │   │   └── lab02.1-agentes.ipynb      # Lab 2.1: Agents with Agent Service (1 hour)
 │   ├── lab03/
 │   │   ├── README.md                  # Step-by-step guide
@@ -104,8 +105,9 @@ foundry-workshop/
 | # | Lab | Duration | Topics |
 |---|-----|----------|--------|
 | 1 | [Models and Deployment](labs/lab01/) | 1 hour | Model deployment, consuming via code, chat completions |
-| 2 | [Agents](labs/lab02/) | 1 hour | Creating agents, tools, function calling |
+| 2 | [Local Agents](labs/lab02/) | 1 hour | Creating local agents, tools, function calling |
 | 2.1 | [Agents with Agent Service](labs/lab02/) | 1 hour | Prompt agents, `AIProjectClient`, Agents Playground |
+| 2.3 | [Hosted Agents](labs/lab02/self-hosted-agents.md) | 1 hour | Hosted agents, containers, custom code on Foundry |
 | 3 | [Workflows with LLM](labs/lab03/) | 1 hour | Prompt chaining, chained pipelines, Workflow Agents |
 | 4 | [Multi-Agent Workflows](labs/lab04/) | 1 hour | ConnectedAgentTool, visual workflows, orchestration |
 | 5 | [Knowledge & RAG](labs/lab05/) | 1 hour | Foundry IQ, Knowledge Base, AI Search, agentic retrieval |

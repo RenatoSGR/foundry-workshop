@@ -1,6 +1,6 @@
-# Lab 02 — Agents in Microsoft Foundry
+# Lab 02 — Local Agents in Microsoft Foundry
 
-Step-by-step guide to creating agents with **tools** and with the **Agent Service** in Foundry.
+Step-by-step guide to creating local agents with **tools** and with the **Agent Service** in Foundry.
 
 > 📖 **Official reference:** [What is Microsoft Foundry Agent Service?](https://learn.microsoft.com/azure/foundry/agents/overview)
 
@@ -77,3 +77,13 @@ Foundry supports three types of agents:
 
 - Agent created and functional with tools (function calling)
 - Agent visible and testable in the Foundry portal
+
+---
+
+## Part C — Hosted Agents (lab02.3)
+
+Hosted agents run custom code in containers managed by Foundry. For a full hands-on lab on hosted agents, see the dedicated guide:
+
+👉 **[Self-Hosted Agents Lab](self-hosted-agents.md)**
+
+This part uses the official Microsoft workshop repository and covers building, deploying, and testing hosted agents end-to-end.
